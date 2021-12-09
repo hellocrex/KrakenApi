@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.31313.79
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoissonSoft.KrakenApi", "PoissonSoft.KrakenApi\PoissonSoft.KrakenApi.csproj", "{B06F0B48-AAA7-4BE5-859D-F48CBC3A4F78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KrakenApi.Example", "KrakenApi.Example\KrakenApi.Example.csproj", "{A06DF00F-C4E9-439A-BF32-050D05EBFA25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KrakenApi.Example", "KrakenApi.Example\KrakenApi.Example.csproj", "{A06DF00F-C4E9-439A-BF32-050D05EBFA25}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example", "Example", "{EA3BED64-20CC-4DD2-91BA-1914D226CF92}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoissonSoft.CommonUtils", "PoissonSoft.CommonUtils\Src\PoissonSoft.CommonUtils\PoissonSoft.CommonUtils.csproj", "{745132EF-CADF-469E-B985-C90934373C44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +25,17 @@ Global
 		{A06DF00F-C4E9-439A-BF32-050D05EBFA25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A06DF00F-C4E9-439A-BF32-050D05EBFA25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A06DF00F-C4E9-439A-BF32-050D05EBFA25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{745132EF-CADF-469E-B985-C90934373C44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{745132EF-CADF-469E-B985-C90934373C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{745132EF-CADF-469E-B985-C90934373C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{745132EF-CADF-469E-B985-C90934373C44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A06DF00F-C4E9-439A-BF32-050D05EBFA25} = {EA3BED64-20CC-4DD2-91BA-1914D226CF92}
+		{745132EF-CADF-469E-B985-C90934373C44} = {EA3BED64-20CC-4DD2-91BA-1914D226CF92}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {426A8FF4-A43E-4A89-A34F-4B13B9368EBB}

@@ -6,7 +6,17 @@ namespace KrakenApi.Example
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            ICredentialsProvider credentialsProvider = new NppCryptProvider();
+            KrakenApiClientCredentials credentials;
+            try
+            {
+                credentials = credentialsProvider.GetCredentials();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return;
+            }
         }
     }
 }
