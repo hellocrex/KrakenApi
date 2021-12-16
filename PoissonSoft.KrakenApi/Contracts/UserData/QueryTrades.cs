@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace PoissonSoft.KrakenApi.Contracts.UserData
 {
-    public class AccountBalance
+    public class QueryTrades
     {
         [JsonProperty("error")]
         public string[] Error { get; set; }
 
         [JsonProperty("result")]
-        public Dictionary<string, string> Result { get; set; }
+        public Dictionary<string, TradeHistoryInfo> Result { get; set; }
     }
-
 }

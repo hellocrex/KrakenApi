@@ -13,10 +13,10 @@ namespace PoissonSoft.KrakenApi.Contracts.UserData.Request
         [JsonProperty("nonce")] 
         public long Nonce = Convert.ToInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
 
-        ///// <summary>
-        ///// Asset pair to get data for
-        ///// </summary>
-        //[JsonProperty("asset")]
-        //public string Asset { get; set; }
+        /// <summary>
+        /// Asset pair to get data for
+        /// </summary>
+        [JsonProperty("asset")]
+        public string Ticker { get; set; }
     }
 }

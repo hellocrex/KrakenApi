@@ -41,45 +41,45 @@ namespace PoissonSoft.KrakenApi.Userdata
         }
 
         /// <inheritdoc />
-        public AccountBalance GetClosedOrders(ReqOrders req)
+        public ClosedOrders GetClosedOrders(ReqOrders req)
         {
-            return client.MakeRequest<AccountBalance>(new RequestParameters(HttpMethod.Post, "0/private/ClosedOrders", 1, req));
+            return client.MakeRequest<ClosedOrders>(new RequestParameters(HttpMethod.Post, "0/private/ClosedOrders", 1, req));
         }
 
         /// <inheritdoc />
-        public AccountBalance QueryOrdersInfo(ReqOrders req)
+        public QueryOrdersInfo QueryOrdersInfo(ReqSpecificOrdersInfo req)
         {
-            return client.MakeRequest<AccountBalance>(new RequestParameters(HttpMethod.Post, "0/private/QueryOrders", 1, req));
+            return client.MakeRequest<QueryOrdersInfo>(new RequestParameters(HttpMethod.Post, "0/private/QueryOrders", 1, req));
         }
 
         /// <inheritdoc />
-        public AccountBalance GetTradesHistory(ReqOrders req)
+        public TradeHistory GetTradesHistory(ReqOrders req)
         {
-            return client.MakeRequest<AccountBalance>(new RequestParameters(HttpMethod.Post, "0/private/TradesHistory", 1, req));
+            return client.MakeRequest<TradeHistory>(new RequestParameters(HttpMethod.Post, "0/private/TradesHistory", 1, req));
         }
 
         /// <inheritdoc />
-        public AccountBalance QueryTradesInfo(ReqTrades req)
+        public QueryTrades QueryTradesInfo(ReqTrades req)
         {
-            return client.MakeRequest<AccountBalance>(new RequestParameters(HttpMethod.Post, "0/private/QueryTrades", 1, req));
+            return client.MakeRequest<QueryTrades>(new RequestParameters(HttpMethod.Post, "0/private/QueryTrades", 1, req));
         }
 
         /// <inheritdoc />
-        public AccountBalance GetLedgersInfo(ReqOrders req)
+        public LedgersInfo GetLedgersInfo(ReqOrders req)
         {
-            return client.MakeRequest<AccountBalance>(new RequestParameters(HttpMethod.Post, "0/private/Ledgers", 1, req));
+            return client.MakeRequest<LedgersInfo>(new RequestParameters(HttpMethod.Post, "0/private/Ledgers", 1, req));
         }
 
         /// <inheritdoc />
-        public AccountBalance QueryLedgers(ReqLedgers req)
+        public QueryLedgers QueryLedgers(ReqLedgers req)
         {
-            return client.MakeRequest<AccountBalance>(new RequestParameters(HttpMethod.Post, "0/private/QueryLedgers", 1, req));
+            return client.MakeRequest<QueryLedgers>(new RequestParameters(HttpMethod.Post, "0/private/QueryLedgers", 1, req));
         }
 
         /// <inheritdoc />
-        public AccountBalance GetTradeVolume(ReqTradeVolume req)
+        public TradeVolume GetTradeVolume(ReqTradeVolume req)
         {
-            return client.MakeRequest<AccountBalance>(new RequestParameters(HttpMethod.Post, "0/private/TradeVolume", 1, req));
+            return client.MakeRequest<TradeVolume>(new RequestParameters(HttpMethod.Post, "0/private/TradeVolume", 1, req));
         }
 
         /// <inheritdoc />

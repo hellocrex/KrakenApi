@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace PoissonSoft.KrakenApi.Contracts.UserData
 {
@@ -11,7 +8,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserData
     public class TradeBalance
     {
         [JsonProperty("error")]
-        public object[] error { get; set; }
+        public string[] Error { get; set; }
         
         [JsonProperty("result")]
         public TradeBalanceInfo Result { get; set; }

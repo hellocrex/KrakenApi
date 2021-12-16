@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using PoissonSoft.KrakenApi.Contracts.UserData;
+﻿using PoissonSoft.KrakenApi.Contracts.UserData;
 using PoissonSoft.KrakenApi.Contracts.UserData.Request;
 
 namespace PoissonSoft.KrakenApi.Userdata
@@ -34,14 +31,14 @@ namespace PoissonSoft.KrakenApi.Userdata
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        AccountBalance GetClosedOrders(ReqOrders req);
+        ClosedOrders GetClosedOrders(ReqOrders req);
 
         /// <summary>
         /// Retrieve information about specific orders.
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        AccountBalance QueryOrdersInfo(ReqOrders req);
+        QueryOrdersInfo QueryOrdersInfo(ReqSpecificOrdersInfo req);
 
         /// <summary>
         /// Retrieve information about trades/fills. 50 results are returned at a time, the most recent by default.
@@ -50,28 +47,28 @@ namespace PoissonSoft.KrakenApi.Userdata
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        AccountBalance GetTradesHistory(ReqOrders req);
+        TradeHistory GetTradesHistory(ReqOrders req);
 
         /// <summary>
         /// Retrieve information about specific trades/fills.
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        AccountBalance QueryTradesInfo(ReqTrades req);
+        QueryTrades QueryTradesInfo(ReqTrades req);
 
         /// <summary>
         /// Retrieve information about ledger entries. 50 results are returned at a time, the most recent by default.
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        AccountBalance GetLedgersInfo(ReqOrders req);
+        LedgersInfo GetLedgersInfo(ReqOrders req);
 
         /// <summary>
         /// Retrieve information about specific ledger entries.
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        AccountBalance QueryLedgers(ReqLedgers req);
+        QueryLedgers QueryLedgers(ReqLedgers req);
 
         /// <summary>
         /// Note: If an asset pair is on a maker/taker fee schedule, the taker side is given in fees and maker side in fees_maker.
@@ -79,6 +76,6 @@ namespace PoissonSoft.KrakenApi.Userdata
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        AccountBalance GetTradeVolume(ReqTradeVolume req);
+        TradeVolume GetTradeVolume(ReqTradeVolume req);
     }
 }

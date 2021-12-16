@@ -2,6 +2,8 @@
 using PoissonSoft.KrakenApi.MarketData;
 using PoissonSoft.KrakenApi.Transport;
 using PoissonSoft.KrakenApi.Userdata;
+using PoissonSoft.KrakenApi.UserFunding;
+using PoissonSoft.KrakenApi.UserTrade;
 
 namespace KrakenApi
 {
@@ -24,13 +26,10 @@ namespace KrakenApi
 
             marketDataApi = new MarketDataApi(this, credentials, logger);
             userDataApi = new UserDataApi(this, credentials, logger);
-            //spotDataStream = new SpotUserDataStream(this, credentials);
-            /* spotDataCollector = new SpotDataCollector(this);
-             marketDataApi = new MarketDataApi(this, credentials, logger);
-             spotAccountApi = new SpotAccountApi(this, credentials, logger);
-             walletApi = new WalletApi(this, credentials, logger);
+            userTradeApi = new UserTradeApi(this, credentials, logger);
+            userFundingApi = new UserFundingApi(this, credentials, logger);
 
-             marketStreamsManager = new MarketStreamsManager(this, credentials);*/
+            //marketStreamsManager = new MarketStreamsManager(this, credentials);
         }
 
         /// <summary>
@@ -40,10 +39,22 @@ namespace KrakenApi
         private readonly MarketDataApi marketDataApi;
 
         /// <summary>
-        /// Rest-API для получение данных о пользователе
+        /// Rest-API для получения состояния и данных об операциях пользователя
         /// </summary>
         public IUserDataApi UserDataApi => userDataApi;
         private readonly UserDataApi userDataApi;
+
+        /// <summary>
+        /// Rest-API для управления торговыми операциями
+        /// </summary>
+        public IUserTradeApi UserTradeApi => userTradeApi;
+        private readonly UserTradeApi userTradeApi;
+
+        /// <summary>
+        /// Rest-API для получения информации о пополнениях и снятиях средств
+        /// </summary>
+        public IUserFundingApi UserFundingApi => userFundingApi;
+        private readonly UserFundingApi userFundingApi;
 
         /// <summary>
         /// В режиме отладке логгируется больше событий

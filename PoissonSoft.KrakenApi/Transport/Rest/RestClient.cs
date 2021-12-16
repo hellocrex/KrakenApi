@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -18,7 +16,6 @@ using Newtonsoft.Json.Linq;
 using NLog;
 using PoissonSoft.KrakenApi.Contracts.Exceptions;
 using PoissonSoft.KrakenApi.Contracts.Serialization;
-using PoissonSoft.KrakenApi.Contracts.UserData.Request;
 using PoissonSoft.KrakenApi.Utils;
 
 namespace PoissonSoft.KrakenApi.Transport.Rest
@@ -118,23 +115,11 @@ namespace PoissonSoft.KrakenApi.Transport.Rest
 
                 if (requestParameters.Method == HttpMethod.Post || requestParameters.Method == HttpMethod.Put)
                 {
-                    //var postBody = JsonConvert.SerializeObject(requestParameters.Parameters);
                     var endPoint = $"{requestParameters.SpecialPath}";
 
                     string postUrl = BuildQueryString(requestParameters.Parameters);
                     if (useSignature)
                     {
-                        //var postData = postUrl + postBody;
-                        //var nonce = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-                        //n = SignHttpWebRequest(endPoint, postData, nonce);
-                        //var parameters = new Dictionary<string, object>
-                        //{
-                        //    //{"nonce", GetNonce(Convert.ToInt64(nonceTime))}
-                        //    {"nonce", nonceTime},
-                        //   // {"asset", asset}
-                        //};
-
-                       // var stringData = string.Join("&", parameters.OrderBy(p => p.Key != "nonce").Select(p => $"{p.Key}={p.Value}"));
                        AddAuthenticationToHeaders($"{httpClient.BaseAddress}{endPoint}?{postUrl}", HttpMethod.Post, requestParameters.Parameters);
                     }
                     
@@ -172,18 +157,11 @@ namespace PoissonSoft.KrakenApi.Transport.Rest
                     }
 
                     // if (useSignature) SignHttpWebRequest(requestParameters.Method.ToString(), url);
-                    
                     using (var result = requestParameters.Method == HttpMethod.Get
                         ? httpClient.GetAsync(url).Result
                         : httpClient.DeleteAsync(url).Result)
                     {
                         strResp = result.Content.ReadAsStringAsync().Result;
-
-                        // превышение лимита количества вызовов метода
-                        if (result.StatusCode == (HttpStatusCode)429)
-                        {
-                            //checkResponse(result, strResp);
-                        }
                         
                         checkResponse(result, strResp);
                     }
@@ -230,77 +208,32 @@ namespace PoissonSoft.KrakenApi.Transport.Rest
                 throw;
             }
         }
-       
-        private string SignHttpWebRequest(string endpoint, string postData, string nonce = "")
-        {
-            //nonce = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            // Step 1: concatenate postData + endpoint
-            var message = postData + nonce + endpoint;
-
-            //Step 2: hash the result of step 1 with SHA256
-            var hash256 = new SHA256Managed();
-            var hash = hash256.ComputeHash(Encoding.UTF8.GetBytes(message));
-
-            //step 3: base64 decode apiPrivateKey
-            var secretDecoded = (System.Convert.FromBase64String(Credentials.SecretKey));
-
-            //step 4: use result of step 3 to hash the resultof step 2 with HMAC-SHA512
-            var hmacsha512 = new HMACSHA512(secretDecoded);
-            var hash2 = hmacsha512.ComputeHash(hash);
-
-            httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.Add("APIKey", Credentials.ApiKey);
-            httpClient.DefaultRequestHeaders.Add("Authent", System.Convert.ToBase64String(hash2));
-            httpClient.DefaultRequestHeaders.Add("Nonce", nonce.ToString());
-            httpClient.DefaultRequestHeaders.Add("User-agent", "cf-api-python/1.0");
-            //step 5: base64 encode the result of step 4 and return
-            return System.Convert.ToBase64String(hash2);
-        }
-
-
-        //public void AddAuthenticationToHeaders(string uri, HttpMethod method, Dictionary<string, object> parameters, bool signed)
+        
         public void AddAuthenticationToHeaders(string uri, HttpMethod method, Dictionary<string, string> parameters)
         {
             if (Credentials.ApiKey == null)
                     throw new ArgumentException("ApiKey/Secret needed");
                 
-                BuildQueryString(parameters);
-                parameters.TryGetValue("nonce", out string nonceTime);
-                //var nonceTime = parameters.Single(n => n.Key == "nonce").Value;
-               // var paramList = parameters.OrderBy(o => o.Key != "nonce");
-                //var pars = string.Join("&", paramList.Select(p => $"{p.Key}={p.Value}"));
-                var pars = BuildQueryString(parameters);
+            BuildQueryString(parameters);
+            parameters.TryGetValue("nonce", out string nonceTime);
+            var pars = BuildQueryString(parameters);
 
-                var result = new Dictionary<string, string> { { "API-Key", Credentials.ApiKey } };
-                var np = nonceTime + pars;
-                byte[] nonceParamsBytes;
-                using (var sha = SHA256.Create())
-                    nonceParamsBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(np));
-                var pathBytes = Encoding.UTF8.GetBytes(uri.Split(new[] { ".com" }, StringSplitOptions.None)[1].Split('?')[0]);
-                var allBytes = pathBytes.Concat(nonceParamsBytes).ToArray();
+            var np = nonceTime + pars;
+            byte[] nonceParamsBytes;
+            using (var sha = SHA256.Create())
+                nonceParamsBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(np));
+            var pathBytes = Encoding.UTF8.GetBytes(uri.Split(new[] { ".com" }, StringSplitOptions.None)[1].Split('?')[0]);
+            var allBytes = pathBytes.Concat(nonceParamsBytes).ToArray();
 
-                byte[] sign;
-                using (var hmac = new HMACSHA512(Convert.FromBase64String(Credentials.SecretKey)))
-                    sign = hmac.ComputeHash(allBytes);
+            byte[] sign;
+            using (var hmac = new HMACSHA512(Convert.FromBase64String(Credentials.SecretKey)))
+                sign = hmac.ComputeHash(allBytes);
 
-                httpClient.DefaultRequestHeaders.Clear();
-                httpClient.DefaultRequestHeaders.Add("API-Key", Credentials.ApiKey);
-                httpClient.DefaultRequestHeaders.Add("API-Sign", Convert.ToBase64String(sign));
-                httpClient.DefaultRequestHeaders.Add("Nonce", nonceTime.ToString());
-                httpClient.DefaultRequestHeaders.Add("User-agent", "cf-api-python/1.0");
-
-        }
-
-        private long GetNonce(long time)
-        {
-            nonce = (nonce + 1) & 8191;
-            return time + nonce;
-        }
-
-        private long lastId = Convert.ToInt64(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-        private long GenerateUniqueId()
-        {
-            return Interlocked.Increment(ref lastId);
+            httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.Add("API-Key", Credentials.ApiKey);
+            httpClient.DefaultRequestHeaders.Add("API-Sign", Convert.ToBase64String(sign));
+            httpClient.DefaultRequestHeaders.Add("Nonce", nonceTime);
+            httpClient.DefaultRequestHeaders.Add("User-agent", "cf-api-python/1.0");
         }
 
         private string BuildQueryString(Dictionary<string, string> paramDic)

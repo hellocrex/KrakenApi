@@ -7,7 +7,7 @@ namespace PoissonSoft.KrakenApi.Contracts.Enums
     /// Enum: "pending" "open" "closed" "canceled" "expired"
     /// Which time to use to search
     /// </summary>
-    public enum OrderStatus
+    public enum CloseOrderStatus
     {
         /// <summary>
         /// Неизвестный (ошибочный) тип
@@ -15,33 +15,33 @@ namespace PoissonSoft.KrakenApi.Contracts.Enums
         Unknown,
 
         /// <summary>
-        /// order pending book entry
+        /// 
         /// </summary>
-        [EnumMember(Value = "pending ")]
-        Pending,
+        [EnumMember(Value = "limit ")]
+        Limit,
 
         /// <summary>
-        /// open order
+        /// 
         /// </summary>
-        [EnumMember(Value = "open")]
-        Open,
+        [EnumMember(Value = "stop-loss")]
+        StopLoss,
 
         /// <summary>
-        /// closed order
+        /// 
         /// </summary>
-        [EnumMember(Value = "closed")]
-        Closed,
+        [EnumMember(Value = "take-profit")]
+        TakeProfit,
 
         /// <summary>
-        /// order canceled
+        /// 
         /// </summary>
-        [EnumMember(Value = "canceled ")]
-        Canceled,
+        [EnumMember(Value = "stop-loss-limit ")]
+        StopLossLimit,
 
         /// <summary>
         /// order expired
         /// </summary>
-        [EnumMember(Value = "expired")]
-        Expired
+        [EnumMember(Value = "take-profit-limit")]
+        TakeProfitLimit
     }
 }

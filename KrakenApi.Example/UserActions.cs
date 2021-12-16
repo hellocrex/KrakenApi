@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json;
 using PoissonSoft.CommonUtils.ConsoleUtils;
-using PoissonSoft.KrakenApi.Contracts.MarketData.Request;
+using PoissonSoft.KrakenApi.Contracts.Enums;
 using PoissonSoft.KrakenApi.Contracts.UserData.Request;
+using PoissonSoft.KrakenApi.Contracts.UserFunding.Request;
+using PoissonSoft.KrakenApi.Contracts.UserTrading.Request;
 
 namespace KrakenApi.Example
 {
     internal partial class ActionManager
     {
+        #region UserData
+
         private bool ShowUserDataPage()
         {
             var actions = new Dictionary<ConsoleKey, string>()
@@ -39,62 +42,130 @@ namespace KrakenApi.Example
                 case ConsoleKey.A:
                     SafeCall(() =>
                     {
-                        var exchangeInfo = apiClient.UserDataApi.GetAccountBalance(new ReqEmpty());
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                        var accountBalanceInfo = apiClient.UserDataApi.GetAccountBalance(new ReqEmpty());
+                        Console.WriteLine(JsonConvert.SerializeObject(accountBalanceInfo, Formatting.Indented));
                     });
                     return true;
 
                 case ConsoleKey.B:
                     SafeCall(() =>
                     {
-                        var exchangeInfo = apiClient.UserDataApi.GetTradeBalance(new ReqBalance
+                        var req = new ReqBalance
                         {
-                          //  Asset = InputHelper.GetString("Asset: ")
-                        });
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                            Ticker = InputHelper.GetString("Asset: ")
+                        };
+                        var tradeBalanceInfo = apiClient.UserDataApi.GetTradeBalance(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(tradeBalanceInfo, Formatting.Indented));
                     });
                     return true;
 
                 case ConsoleKey.C:
                     SafeCall(() =>
                     {
-                        var exchangeInfo = apiClient.UserDataApi.GetOpenOrders(new ReqOrders
+                        var req = new ReqOrders
                         {
-                            //  Asset = InputHelper.GetString("Asset: ")
-                        });
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                            Trades = true
+                        };
+                        var openOrdersInfo = apiClient.UserDataApi.GetOpenOrders(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(openOrdersInfo, Formatting.Indented));
                     });
                     return true;
 
                 case ConsoleKey.D:
                     SafeCall(() =>
                     {
-                        var exchangeInfo = apiClient.UserDataApi.GetClosedOrders(new ReqOrders
+                        var req = new ReqOrders
                         {
-                            //  Asset = InputHelper.GetString("Asset: ")
-                        });
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                            Trades = true
+                        };
+                        var closedOrdersInfo = apiClient.UserDataApi.GetClosedOrders(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(closedOrdersInfo, Formatting.Indented));
                     });
                     return true;
 
-                case ConsoleKey.O:
+                case ConsoleKey.E:
                     SafeCall(() =>
                     {
-                        var req = new ReqOrderBook()
+                        var req = new ReqSpecificOrdersInfo
                         {
-                            Instrument = InputHelper.GetString("Instrument: ")
+                            Trades = true,
+                            TxId = InputHelper.GetString("Comma delimited list of transaction IDs to query info about (20 maximum): ")
                         };
-                        var exchangeInfo = apiClient.MarketDataApi.GetOrderBook(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                        var queryOrdersInfo = apiClient.UserDataApi.QueryOrdersInfo(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(queryOrdersInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.F:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqOrders
+                        {
+                            Trades = true
+                        };
+                        var tradesHistoryInfo = apiClient.UserDataApi.GetTradesHistory(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(tradesHistoryInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.G:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqTrades
+                        {
+                            Txid = InputHelper.GetString("Comma delimited list of transaction IDs to query info about (20 maximum): ")
+                        };
+                        var queryTradesInfo = apiClient.UserDataApi.QueryTradesInfo(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(queryTradesInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.I:
+                    SafeCall(() =>
+                    {
+                        var ledgersInfoInfo = apiClient.UserDataApi.GetLedgersInfo(new ReqOrders());
+                        Console.WriteLine(JsonConvert.SerializeObject(ledgersInfoInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.J:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqLedgers
+                        {
+                            Id = InputHelper.GetString("Comma delimited list of ledger IDs to query info about (20 maximum): ")
+                        };
+                        var queryLedgersInfo = apiClient.UserDataApi.QueryLedgers(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(queryLedgersInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.K:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqTradeVolume
+                        {
+                            Instrument = InputHelper.GetString("Comma delimited list of asset pairs to get fee info on (optional): ")
+                        };
+                        var tradeVolumeInfo = apiClient.UserDataApi.GetTradeVolume(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(tradeVolumeInfo, Formatting.Indented));
                     });
                     return true;
 
                 case ConsoleKey.Escape:
                     return false;
                 default:
+                    if (actions.ContainsKey(selectedAction))
+                    {
+                        Console.WriteLine($"Method '{actions[selectedAction]}' is not implemented");
+                    }
                     return true;
             }
         }
+
+        #endregion
+
+        #region UserTrading
 
         private bool ShowUserTradingPage()
         {
@@ -111,14 +182,18 @@ namespace KrakenApi.Example
 
             switch (selectedAction)
             {
-                case ConsoleKey.I:
+                case ConsoleKey.A:
                     SafeCall(() =>
                     {
-                        var req = new ReqTickerInformation()
+                        var req = new ReqNewOrder
                         {
-                            Instrument = InputHelper.GetString("Instrument: ")
+                            OrderType = InputHelper.GetEnum<OrderType>("Order type"),
+                            Instrument = InputHelper.GetString("Instrument: "),
+                            OrderSide = InputHelper.GetEnum<OrderSide>("Order direction (buy/sell)"),
+                            Volume = InputHelper.GetDecimal("Order quantity in terms of the base asset"),
+                            Price = InputHelper.GetDecimal("Price")
                         };
-                        var exchangeInfo = apiClient.MarketDataApi.GetTickerInformation(req);
+                        var exchangeInfo = apiClient.UserTradeApi.AddNewOrder(req);
                         Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
                     });
                     return true;
@@ -126,25 +201,32 @@ namespace KrakenApi.Example
                 case ConsoleKey.B:
                     SafeCall(() =>
                     {
-                        var req = new ReqOHLCData()
+                        var req = new ReqCancelOrder
                         {
-                            Instrument = InputHelper.GetString("Instrument: "),
-                            //Interval = InputHelper.GetEnum<TimeInterval>("Interval: ")
+                            TxId = InputHelper.GetString("Open order transaction ID (txid) or user reference (userref): "),
                         };
-                        var exchangeInfo = apiClient.MarketDataApi.GetOHLCData(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                        var cancelOrderInfo = apiClient.UserTradeApi.CancelOrder(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(cancelOrderInfo, Formatting.Indented));
                     });
                     return true;
 
-                case ConsoleKey.O:
+                case ConsoleKey.C:
                     SafeCall(() =>
                     {
-                        var req = new ReqOrderBook()
+                        var cancelOrderInfo = apiClient.UserTradeApi.CancelAllOrders(new ReqEmpty());
+                        Console.WriteLine(JsonConvert.SerializeObject(cancelOrderInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.D:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqCancelAllAfterX
                         {
-                            Instrument = InputHelper.GetString("Instrument: ")
+                            Timeout = InputHelper.GetInt("Duration (in seconds) to set/extend the timer by: "),
                         };
-                        var exchangeInfo = apiClient.MarketDataApi.GetOrderBook(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                        var cancelOrderInfo = apiClient.UserTradeApi.CancelAllOrdersAfterX(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(cancelOrderInfo, Formatting.Indented));
                     });
                     return true;
 
@@ -154,6 +236,10 @@ namespace KrakenApi.Example
                     return true;
             }
         }
+
+        #endregion
+
+        #region UserFunding
 
         private bool ShowUserFundingPage()
         {
@@ -174,49 +260,126 @@ namespace KrakenApi.Example
 
             switch (selectedAction)
             {
-                case ConsoleKey.I:
+                case ConsoleKey.A:
                     SafeCall(() =>
                     {
-                        var req = new ReqTickerInformation()
+                        var req = new ReqDepositMethod
                         {
-                            Instrument = InputHelper.GetString("Instrument: ")
+                            Ticker = InputHelper.GetString("Ticker: ")
                         };
-                        var exchangeInfo = apiClient.MarketDataApi.GetTickerInformation(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                        var depositMethodsInfo = apiClient.UserFundingApi.GetDepositMethods(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(depositMethodsInfo, Formatting.Indented));
                     });
                     return true;
 
                 case ConsoleKey.B:
                     SafeCall(() =>
                     {
-                        var req = new ReqOHLCData()
+                        var req = new ReqDepositAddress
                         {
-                            Instrument = InputHelper.GetString("Instrument: "),
-                            //Interval = InputHelper.GetEnum<TimeInterval>("Interval: ")
+                            Ticker = InputHelper.GetString("Ticker: "),
+                            Method = InputHelper.GetString("Name of the deposit method: "),
+                            New = true
                         };
-                        var exchangeInfo = apiClient.MarketDataApi.GetOHLCData(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                        var depositAddressesInfo = apiClient.UserFundingApi.GetDepositAddresses(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(depositAddressesInfo, Formatting.Indented));
                     });
                     return true;
 
-                case ConsoleKey.O:
+                case ConsoleKey.C:
                     SafeCall(() =>
                     {
-                        var req = new ReqOrderBook()
+                        var req = new ReqStatusOfRecent()
                         {
-                            Instrument = InputHelper.GetString("Instrument: ")
+                            Ticker = InputHelper.GetString("Ticker: "),
+                            Method = InputHelper.GetString("Name of the deposit method: ")
                         };
-                        var exchangeInfo = apiClient.MarketDataApi.GetOrderBook(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                        var statusOfRecentDepositsInfo = apiClient.UserFundingApi.GetStatusOfRecentDeposits(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(statusOfRecentDepositsInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.D:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqWithdrawalInfo()
+                        {
+                            Ticker = InputHelper.GetString("Ticker: "),
+                            Key = InputHelper.GetString("Withdrawal key name, as set up on your account: "),
+                            Amount = InputHelper.GetInt("Amount to be withdrawn: ")
+                        };
+                        var withdrawalInfo = apiClient.UserFundingApi.GetWithdrawalInformation(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(withdrawalInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.E:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqWithdrawalInfo()
+                        {
+                            Ticker = InputHelper.GetString("Ticker: "),
+                            Key = InputHelper.GetString("Withdrawal key name, as set up on your account: "),
+                            Amount = InputHelper.GetInt("Amount to be withdrawn: ")
+                        };
+                        var withdrawFundsInfo = apiClient.UserFundingApi.WithdrawFunds(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(withdrawFundsInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.F:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqStatusOfRecent
+                        {
+                            Ticker = InputHelper.GetString("Ticker: "),
+                            Method = InputHelper.GetString("Name of the withdrawal method: ")
+                        };
+                        var statusOfRecentWithdrawalsInfo = apiClient.UserFundingApi.GetStatusOfRecentWithdrawals(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(statusOfRecentWithdrawalsInfo, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.G:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqWithdrawalCancel
+                        {
+                            Ticker = InputHelper.GetString("Ticker: "),
+                            RefId = InputHelper.GetString("Withdrawal reference ID: ")
+                        };
+                        var withdrawalCancelation = apiClient.UserFundingApi.RequestWithdrawalCancelation(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(withdrawalCancelation, Formatting.Indented));
+                    });
+                    return true;
+
+                case ConsoleKey.H:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqWalletTransfer
+                        {
+                            Ticker = InputHelper.GetString("Ticker: "),
+                            From = InputHelper.GetString("Source wallet: "),
+                            To = InputHelper.GetString("Destination wallet: "),
+                            Amount = InputHelper.GetInt("Amount to transfer: ")
+                        };
+                        var walletTransferInfo = apiClient.UserFundingApi.RequestWalletTransfer(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(walletTransferInfo, Formatting.Indented));
                     });
                     return true;
 
                 case ConsoleKey.Escape:
                     return false;
                 default:
+                    if (actions.ContainsKey(selectedAction))
+                    {
+                        Console.WriteLine($"Method '{actions[selectedAction]}' is not implemented");
+                    }
                     return true;
             }
         }
+
+        #endregion
 
         #region UserStaking
 
@@ -236,46 +399,13 @@ namespace KrakenApi.Example
 
             switch (selectedAction)
             {
-                case ConsoleKey.I:
-                    SafeCall(() =>
-                    {
-                        var req = new ReqTickerInformation()
-                        {
-                            Instrument = InputHelper.GetString("Instrument: ")
-                        };
-                        var exchangeInfo = apiClient.MarketDataApi.GetTickerInformation(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
-                    });
-                    return true;
-
-                case ConsoleKey.B:
-                    SafeCall(() =>
-                    {
-                        var req = new ReqOHLCData()
-                        {
-                            Instrument = InputHelper.GetString("Instrument: "),
-                            //Interval = InputHelper.GetEnum<TimeInterval>("Interval: ")
-                        };
-                        var exchangeInfo = apiClient.MarketDataApi.GetOHLCData(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
-                    });
-                    return true;
-
-                case ConsoleKey.O:
-                    SafeCall(() =>
-                    {
-                        var req = new ReqOrderBook()
-                        {
-                            Instrument = InputHelper.GetString("Instrument: ")
-                        };
-                        var exchangeInfo = apiClient.MarketDataApi.GetOrderBook(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
-                    });
-                    return true;
-
                 case ConsoleKey.Escape:
                     return false;
                 default:
+                    if (actions.ContainsKey(selectedAction))
+                    {
+                        Console.WriteLine($"Method '{actions[selectedAction]}' is not implemented");
+                    }
                     return true;
             }
         }

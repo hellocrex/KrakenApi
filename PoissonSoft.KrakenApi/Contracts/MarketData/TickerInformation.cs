@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace PoissonSoft.KrakenApi.Contracts.MarketData
@@ -10,8 +8,11 @@ namespace PoissonSoft.KrakenApi.Contracts.MarketData
     /// </summary>
     public class TickerInformation
     {
-        public object[] error { get; set; }
-        public Dictionary<string, TickerInfo> result { get; set; }
+        [JsonProperty("result")]
+        public Dictionary<string, TickerInfo> Result { get; set; }
+
+        [JsonProperty("error")]
+        public string[] Error { get; set; }
     }
 
     /// <summary>
@@ -20,59 +21,57 @@ namespace PoissonSoft.KrakenApi.Contracts.MarketData
     public class TickerInfo
     {
         /// <summary>
-        /// asks
+        /// Asks
         /// </summary>
         [JsonProperty("a")]
-        public string[] a { get; set; }
+        public string[] Asks { get; set; }
 
         /// <summary>
-        /// asks
+        /// Bid
         /// </summary>
         [JsonProperty("b")]
-        public string[] b { get; set; }
+        public string[] Bid { get; set; }
 
         /// <summary>
-        /// asks
+        /// Last trade closed
         /// </summary>
         [JsonProperty("c")]
-        public string[] c { get; set; }
+        public string[] Closed { get; set; }
 
         /// <summary>
-        /// asks
+        /// Volume
         /// </summary>
         [JsonProperty("v")]
-        public string[] v { get; set; }
+        public string[] Volume { get; set; }
 
         /// <summary>
-        /// asks
+        /// Volume weighted average price
         /// </summary>
         [JsonProperty("p")]
-        public string[] p { get; set; }
+        public string[] VolumeAveragePrice { get; set; }
 
         /// <summary>
-        /// asks
+        /// Number of trades
         /// </summary>
         [JsonProperty("t")]
-        public int[] t { get; set; }
+        public int[] TradeCount { get; set; }
 
         /// <summary>
-        /// asks
+        /// Low
         /// </summary>
         [JsonProperty("l")]
-        public string[] l { get; set; }
+        public string[] Low { get; set; }
 
         /// <summary>
-        /// asks
+        /// High
         /// </summary>
         [JsonProperty("h")]
-        public string[] h { get; set; }
+        public string[] High { get; set; }
 
         /// <summary>
-        /// asks
+        /// Today's opening price
         /// </summary>
         [JsonProperty("o")]
-        public string o { get; set; }
+        public string OpenPrice { get; set; }
     }
-
-
 }

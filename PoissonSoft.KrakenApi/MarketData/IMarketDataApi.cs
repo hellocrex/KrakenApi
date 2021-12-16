@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using PoissonSoft.KrakenApi.Contracts;
-using PoissonSoft.KrakenApi.Contracts.MarketData;
+﻿using PoissonSoft.KrakenApi.Contracts.MarketData;
 using PoissonSoft.KrakenApi.Contracts.MarketData.Request;
 
 namespace PoissonSoft.KrakenApi.MarketData
@@ -10,11 +6,18 @@ namespace PoissonSoft.KrakenApi.MarketData
     public interface IMarketDataApi
     {
         /// <summary>
+        /// Get tradable asset pairs
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        InstrumentInformation GetTradableAssetPairs(ReqInstrumentInformation req);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        TickerInformation GetTickerInformation(ReqTickerInformation req);
+        TickerInformation GetTickerInformation(ReqInstrumentInformation req);
 
         /// <summary>
         /// 
