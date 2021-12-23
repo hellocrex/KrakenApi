@@ -30,6 +30,8 @@ namespace KrakenApi.Example
                 [ConsoleKey.C] = "User Trading",
                 [ConsoleKey.D] = "User Funding",
                 [ConsoleKey.E] = "User Staking",
+                [ConsoleKey.F] = "MarketDataStream",
+                [ConsoleKey.G] = "UserDataStream",
 
                 [ConsoleKey.Escape] = "Go back (exit)",
             };
@@ -52,6 +54,12 @@ namespace KrakenApi.Example
                     return true;
                 case ConsoleKey.E:
                     while (ShowUserStakingPage()) { }
+                    return true;
+                case ConsoleKey.F:
+                    while (ShowMarketStreamPage()) { }
+                    return true;
+                case ConsoleKey.G:
+                    while (SowUserDataStreamPage()) {}
                     return true;
 
                 case ConsoleKey.Escape:

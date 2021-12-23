@@ -1,7 +1,9 @@
 ﻿using NLog;
 using PoissonSoft.KrakenApi.MarketData;
+using PoissonSoft.KrakenApi.MarketDataStreams;
 using PoissonSoft.KrakenApi.Transport;
 using PoissonSoft.KrakenApi.Userdata;
+using PoissonSoft.KrakenApi.UserDataStream;
 using PoissonSoft.KrakenApi.UserFunding;
 using PoissonSoft.KrakenApi.UserTrade;
 
@@ -29,7 +31,8 @@ namespace KrakenApi
             userTradeApi = new UserTradeApi(this, credentials, logger);
             userFundingApi = new UserFundingApi(this, credentials, logger);
 
-            //marketStreamsManager = new MarketStreamsManager(this, credentials);
+            marketStreamManager = new MarketDataStreams(this, credentials);
+            userStreamManager = new UserDataStreams(this, credentials);
         }
 
         /// <summary>
@@ -55,6 +58,18 @@ namespace KrakenApi
         /// </summary>
         public IUserFundingApi UserFundingApi => userFundingApi;
         private readonly UserFundingApi userFundingApi;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IMarketDataStreams MarketStreamManager => marketStreamManager;
+        private readonly MarketDataStreams marketStreamManager;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IUserDataStreams UserDataStream => userStreamManager;
+        private readonly UserDataStreams userStreamManager;
 
         /// <summary>
         /// В режиме отладке логгируется больше событий
