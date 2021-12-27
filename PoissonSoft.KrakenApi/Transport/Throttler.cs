@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -18,7 +20,12 @@ namespace PoissonSoft.KrakenApi.Transport
         private readonly string userFriendlyName = nameof(Throttler);
         private readonly WaitablePool syncPool;
         private readonly WaitablePool syncPoolWs;
-        
+
+        private List<FeedLocker> actualFeedLockerCounter;
+
+        private Dictionary<FeedLocker, DateTimeOffset> actualFeedLockerDictionary =
+            new Dictionary<FeedLocker, DateTimeOffset>();
+
         // "Стоимость" одного бала в миллисекундах для каждого из параллельно исполняемых REST-запросов.
         // Т.е. если в конкретном потоке (одном из всех MaxDegreeOfParallelism параллельных) выполняется запрос
         // с весом 1 балл, то этот поток не должен проводить новых запросов в течение requestWeightCostInMs миллисекунд
@@ -32,12 +39,6 @@ namespace PoissonSoft.KrakenApi.Transport
 
         // Время (UTC), до которого приостановлены все запросы в связи с превышением лимита
         private object rateLimitPausedTime = DateTimeOffset.MinValue;
-
-        /// <summary>
-        /// Включение/выключение автоматического обновления актуальных лимитов.
-        /// По умолчанию авто-обновление включено
-        /// </summary>
-        public bool AutoUpdateLimits { get; set; } = true;
 
         /// <summary>
         /// Максимальное количество параллельно выполняемых запросов
@@ -66,31 +67,7 @@ namespace PoissonSoft.KrakenApi.Transport
             if (HighPriorityFeedsCount >= MaxDegreeOfParallelism)
                 HighPriorityFeedsCount = MaxDegreeOfParallelism - 1;
 
-
-            ApplyLimits(new []
-            {
-                new RateLimit
-                {
-                    RateLimitType = RateLimitType.RequestWeight,
-                    IntervalUnit = RateLimitUnit.Minute,
-                    IntervalNum = 1,
-                    Limit = 1200,
-                }, 
-                new RateLimit
-                {
-                    RateLimitType = RateLimitType.Orders,
-                    IntervalUnit = RateLimitUnit.Second,
-                    IntervalNum = 10,
-                    Limit = 100,
-                },
-                new RateLimit
-                {
-                    RateLimitType = RateLimitType.Orders,
-                    IntervalUnit = RateLimitUnit.Day,
-                    IntervalNum = 1,
-                    Limit = 200_000,
-                },
-            });
+            actualFeedLockerCounter = new List<FeedLocker>();
 
             syncPool = new WaitablePool(MaxDegreeOfParallelism, highPriorityFeedsCount);
 
@@ -104,47 +81,11 @@ namespace PoissonSoft.KrakenApi.Transport
         /// <summary>
         /// Применить актуальные лимиты
         /// </summary>
-        /// <param name="limits"></param>
-        public void ApplyLimits(RateLimit[] limits)
+        /// <param name="maxWeigthRequest"></param>
+        public void CalculateWeightUnitCost( int maxWeigthRequest)
         {
-            // В данной реализации учитываем пока только лимит на вес запросов с одного IP.
-            // лимит количества ордеров не отслеживаем
-            var validRateLimits = limits?.Where(x =>
-                x.RateLimitType == RateLimitType.RequestWeight &&
-                x.IntervalUnit > 0 &&
-                x.IntervalNum > 0 &&
-                x.Limit > 0).ToArray();
-
-            var weightPerSecondLimits = validRateLimits
-                ?.Select(x => (double) x.Limit / ((int) x.IntervalUnit * x.IntervalNum))
-                .Where(x => x > 0)
-                .ToArray();
-
-            double minWeightPerSecondLimit;
-            if (weightPerSecondLimits?.Any() == true)
-            {
-                minWeightPerSecondLimit = weightPerSecondLimits.Min();
-            }
-            else
-            {
-                minWeightPerSecondLimit = 20;
-                apiClient.Logger.Error(
-                    $"{userFriendlyName}. Среди переданных в метод {nameof(ApplyLimits)} лимитов " +
-                    $"не обнаружено ни одного валидного лимита типа {RateLimitType.RequestWeight}. " +
-                    $"Будет использовано значение по умолчанию ({minWeightPerSecondLimit}) " +
-                    "для лимита весов запросов в секунду");
-            }
-
-            var costMs = (int)Math.Ceiling(1000 / minWeightPerSecondLimit) * MaxDegreeOfParallelism;
-
-            Interlocked.Exchange(ref weightUnitCostInMs, costMs);
-
-            var timeFrames = validRateLimits
-                ?.Select(x => (int) x.IntervalUnit * x.IntervalNum)
-                .Where(x => x > 0)
-                .ToArray();
-            var maxTimeFrame = timeFrames?.Any() == true ? timeFrames.Max() : 60;
-            Interlocked.Exchange(ref defaultRetryAfterSec, maxTimeFrame);
+            var minWeightPerSecondLimit = (maxWeigthRequest / 0.30) * 1000;
+            Interlocked.Exchange(ref weightUnitCostInMs, (int)minWeightPerSecondLimit);
         }
 
         /// <summary>
@@ -155,19 +96,39 @@ namespace PoissonSoft.KrakenApi.Transport
         /// <param name="isOrderRequest"></param>
         public void ThrottleRest(int requestWeight, bool highPriority, bool isOrderRequest)
         {
+            CalculateWeightUnitCost(requestWeight);
+
             var dt = DateTimeOffset.UtcNow;
             var locker = syncPool.Wait(highPriority);
-            locker.UnlockAfterMs(requestWeight * weightUnitCostInMs);
+
+            var tmpLockers = new FeedLocker[actualFeedLockerCounter.Count];
+            actualFeedLockerCounter.CopyTo(tmpLockers);
+            var tmpLockerList = new List<FeedLocker>();
+            foreach (var tmpLocker in tmpLockers)
+            {
+                tmpLockerList.Add(tmpLocker);
+            }
+
+            foreach (var item in tmpLockerList)
+            {
+                if (actualFeedLockerDictionary[item] <= DateTimeOffset.Now)
+                {
+                    actualFeedLockerCounter.Remove(item);
+                    actualFeedLockerDictionary.Remove(item);
+                }
+            }
+            
+            locker.UnlockAfterMs(weightUnitCostInMs * (actualFeedLockerCounter.Count + 1));
+
+            actualFeedLockerCounter.Add(locker);
+            actualFeedLockerDictionary.Add(locker, dt.AddMilliseconds(weightUnitCostInMs * (actualFeedLockerCounter.Count + 1)));
+
+
             var waitTime = (DateTimeOffset.UtcNow - dt).TotalSeconds;
-            if (waitTime > 5)
+            if (waitTime > 8)
             {
                 apiClient.Logger.Warn($"{userFriendlyName}. Время ожидания тротлинга REST-запроса составило {waitTime:F0} секунд. " +
                                       "Возможно, следует оптимизировать прикладные алгоритмы с целью сокращения количества запросов");
-            }
-
-            if (AutoUpdateLimits && ssUpdateLimits.Check())
-            {
-                Task.Run(UpdateLimits);
             }
 
             // Здесь не используем Interlocked для чтения rateLimitPausedTime по следующим соображениям:
@@ -230,23 +191,6 @@ namespace PoissonSoft.KrakenApi.Transport
 
         private readonly SimpleScheduler ssUpdateLimits = new SimpleScheduler(TimeSpan.FromMinutes(10));
         private readonly object syncUpdateLimits = new object();
-        private void UpdateLimits()
-        {
-            lock (syncUpdateLimits)
-            {
-                if (!ssUpdateLimits.Check()) return;
-                try
-                {
-                    //var exchangeInfo = apiClient.MarketDataApi.GetExchangeInfo();
-                    //ApplyLimits(exchangeInfo?.RateLimits);
-                    //ssUpdateLimits.Done();
-                }
-                catch (Exception e)
-                {
-                    apiClient.Logger.Error($"{userFriendlyName}. Exception when limit update\n{e}");
-                }
-            }
-        }
 
         public void Dispose()
         {

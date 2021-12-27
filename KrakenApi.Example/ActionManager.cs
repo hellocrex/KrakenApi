@@ -73,7 +73,11 @@ namespace KrakenApi.Example
         {
             try
             {
+                var dtStart = DateTimeOffset.Now;
+                Console.WriteLine($"Time start {DateTimeOffset.Now}");
                 action();
+                Console.WriteLine($"Time end {DateTimeOffset.Now}");
+                Console.WriteLine($"Total time {(DateTimeOffset.Now - dtStart).TotalSeconds}");
             }
             catch (Exception e)
             {

@@ -2,11 +2,15 @@
 using PoissonSoft.KrakenApi.Contracts.PrivateWebSocket;
 using PoissonSoft.KrakenApi.Contracts.PublicWebSocket;
 using PoissonSoft.KrakenApi.MarketDataStreams;
+using PoissonSoft.KrakenApi.Transport;
 
 namespace PoissonSoft.KrakenApi.UserDataStream
 {
     public interface IUserDataStreams
     {
+
+        DataStreamStatus WsConnectionStatus { get; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -19,12 +23,17 @@ namespace PoissonSoft.KrakenApi.UserDataStream
         /// </summary>
         /// <param name="callbackAction"></param>
         /// <returns></returns>
-        SubscriptionInfo SubscribeOnOpenOrders(Action<OHLCPayload> callbackAction);
+        SubscriptionInfo AddNewOrder(Action<OHLCPayload> callbackAction);
 
         /// <summary>
         /// Unsubscribe all subscriptions
         /// </summary>
         void UnsubscribeAll();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void Open();
 
         /// <summary>
         /// 

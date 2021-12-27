@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PoissonSoft.KrakenApi.Contracts.Enums;
 using PoissonSoft.KrakenApi.Contracts.Serialization;
 
 namespace PoissonSoft.KrakenApi.Contracts.MarketDataStream
@@ -23,13 +24,53 @@ namespace PoissonSoft.KrakenApi.Contracts.MarketDataStream
         public long RequestId { get; set; }
 
         /// <summary>
+        /// Session token string
+        /// </summary>
+        [JsonProperty("token", NullValueHandling = NullValueHandling.Ignore)]
+        public string Token { get; set; }
+
+        /// <summary>
         /// Optional - Array of currency pairs. Format of each pair is "A/B",
         /// where A and B are ISO 4217-A3 for standardized assets and popular unique symbol if not standardized.
         /// </summary>
         [JsonProperty("pair", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string[] Instruments { get; set; }
 
-        [JsonProperty("subscription")]
+        /// <summary>
+        /// Order type - market|limit|stop-loss|take-profit|stop-loss-limit|take-profit-limit|settle-position
+        /// </summary>
+        [JsonProperty("ordertype", NullValueHandling = NullValueHandling.Ignore)]
+        public OrderType? OrderType { get; set; }
+
+        /// <summary>
+        /// type of order (buy/sell)
+        /// </summary>
+        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public OrderSide? OrderSide { get; set; }
+
+        /// <summary>
+        /// Optional dependent on order type - order price
+        /// </summary>
+        [JsonProperty("price", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? Price { get; set; }
+
+        /// <summary>
+        /// volume (base currency)
+        /// </summary>
+        [JsonProperty("volume", NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? Volume { get; set; }
+
+        /// <summary>
+        /// Optional - time in force. Supported values include GTC (good-til-cancelled; default),
+        /// IOC (immediate-or-cancel), GTD (good-til-date; expiretm must be specified).
+        /// </summary>
+        [JsonProperty("timeinforce", NullValueHandling = NullValueHandling.Ignore)]
+        public TimeInForce? TimeInForce { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonProperty("subscription", NullValueHandling = NullValueHandling.Ignore)]
         public SubscriptionContext Subscription { get; set; }
     }
 

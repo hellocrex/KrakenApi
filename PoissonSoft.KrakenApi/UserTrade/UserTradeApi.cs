@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using KrakenApi;
 using NLog;
-using PoissonSoft.KrakenApi.Contracts.UserData;
 using PoissonSoft.KrakenApi.Contracts.UserData.Request;
-using PoissonSoft.KrakenApi.Contracts.UserFunding.Request;
 using PoissonSoft.KrakenApi.Contracts.UserTrading;
 using PoissonSoft.KrakenApi.Contracts.UserTrading.Request;
 using PoissonSoft.KrakenApi.Transport;

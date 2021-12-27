@@ -77,6 +77,5 @@ namespace KrakenApi
         public bool IsDebug { get; set; } = false;
 
         internal Throttler Throttler { get; }
-
     }
 }

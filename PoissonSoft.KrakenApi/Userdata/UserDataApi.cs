@@ -55,7 +55,7 @@ namespace PoissonSoft.KrakenApi.Userdata
         /// <inheritdoc />
         public TradeHistory GetTradesHistory(ReqOrders req)
         {
-            return client.MakeRequest<TradeHistory>(new RequestParameters(HttpMethod.Post, "0/private/TradesHistory", 1, req));
+            return client.MakeRequest<TradeHistory>(new RequestParameters(HttpMethod.Post, "0/private/TradesHistory", 2, req, true));
         }
 
         /// <inheritdoc />

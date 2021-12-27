@@ -78,7 +78,6 @@ namespace PoissonSoft.KrakenApi.Transport.Rest
             if (requestParameters.RequestWeight > 0)
                 throttler.ThrottleRest(requestParameters.RequestWeight, requestParameters.IsHighPriority, requestParameters.IsOrderRequest);
 
-
             void checkResponse(HttpResponseMessage resp, string body)
             {
                 throttler.ApplyRestResponseHeaders(resp.Headers);
@@ -293,11 +292,12 @@ namespace PoissonSoft.KrakenApi.Transport.Rest
         /// </summary>
         public Dictionary<string, string> Parameters { get; set; }
 
-        public RequestParameters(HttpMethod method, string specialPath, int requestWeight = 100, object request = null)
+        public RequestParameters(HttpMethod method, string specialPath, int requestWeight = 100, object request = null, bool isHighPriority = false)
         {
             Method = method;
             SpecialPath = specialPath;
             RequestWeight = requestWeight;
+            IsHighPriority = isHighPriority;
             if (request != null) Parameters = GenerateParametersFromObject(request);
         }
 

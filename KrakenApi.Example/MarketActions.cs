@@ -267,16 +267,10 @@ namespace KrakenApi.Example
                 case ConsoleKey.B:
                     SafeCall(() =>
                     {
-                        SubscribeOnOpenOrders();
+                        AddOrders();
                     });
                     return true;
                 case ConsoleKey.C:
-                    SafeCall(() =>
-                    {
-
-                    });
-                    return true;
-                case ConsoleKey.D:
                     SafeCall(() =>
                     {
 
@@ -309,11 +303,11 @@ namespace KrakenApi.Example
             }
         }
 
-        private void SubscribeOnOpenOrders()
+        private void AddOrders()
         {
             try
             {
-                //var subscriptionInfo = apiClient.UserDataStream.SubscribeOnOpenOrders(OnPayloadReceived);
+                var subscriptionInfo = apiClient.UserDataStream.AddNewOrder(OnPayloadReceived);
 
                 //Console.WriteLine($"Subscription Info:\n{JsonConvert.SerializeObject(subscriptionInfo, Formatting.Indented)}");
             }

@@ -42,8 +42,12 @@ namespace KrakenApi.Example
                 case ConsoleKey.A:
                     SafeCall(() =>
                     {
-                        var accountBalanceInfo = apiClient.UserDataApi.GetAccountBalance(new ReqEmpty());
-                        Console.WriteLine(JsonConvert.SerializeObject(accountBalanceInfo, Formatting.Indented));
+                        for (int i = 0; i < 500; i++)
+                        {
+                            var accountBalanceInfo = apiClient.UserDataApi.GetAccountBalance(new ReqEmpty());
+                            Console.WriteLine(JsonConvert.SerializeObject(accountBalanceInfo, Formatting.Indented));
+                        }
+                        
                     });
                     return true;
 
@@ -99,12 +103,17 @@ namespace KrakenApi.Example
                 case ConsoleKey.F:
                     SafeCall(() =>
                     {
-                        var req = new ReqOrders
+                        for (int i = 1; i < 9; i++)
                         {
-                            Trades = true
-                        };
-                        var tradesHistoryInfo = apiClient.UserDataApi.GetTradesHistory(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(tradesHistoryInfo, Formatting.Indented));
+                            var req = new ReqOrders
+                            {
+                                Trades = true
+                            };
+                            var tradesHistoryInfo = apiClient.UserDataApi.GetTradesHistory(req);
+                            Console.WriteLine($"Номер итерации {i}, Iteration start {DateTimeOffset.Now}");
+                            Console.WriteLine(JsonConvert.SerializeObject(tradesHistoryInfo, Formatting.Indented));
+                        }
+
                     });
                     return true;
 

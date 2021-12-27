@@ -87,7 +87,7 @@ namespace PoissonSoft.KrakenApi.UserDataStream
             });
         }
 
-        private void Open()
+        public void Open()
         {
             if (WsConnectionStatus == DataStreamStatus.Active
                 || WsConnectionStatus == DataStreamStatus.Closing
@@ -175,7 +175,6 @@ namespace PoissonSoft.KrakenApi.UserDataStream
             return subscriptionInfo;
         }
 
-        /// <inheritdoc />
         public SubscriptionInfo SubscribeOnOpenOrders(Action<OHLCPayload> callbackAction)
         {
             var subscriptionInfo = new SubscriptionInfo
@@ -199,6 +198,33 @@ namespace PoissonSoft.KrakenApi.UserDataStream
 
             return subscriptionInfo;
         }
+
+        /// <inheritdoc />
+        public SubscriptionInfo AddNewOrder(Action<OHLCPayload> callbackAction)
+        {
+            var subscriptionInfo = new SubscriptionInfo
+            {
+                Id = GenerateUniqueId(),
+                Method = SubscribeMethodName.AddOrder,
+            };
+            var subscriptionWrap = new SubscriptionWrap
+            {
+                Info = subscriptionInfo,
+                CallbackAction = callbackAction
+            };
+            var needSubscribeToStream = AddSubscription(subscriptionWrap);
+
+            if (needSubscribeToStream)
+            {
+                var resp = SubscribeToStream(subscriptionInfo);
+                if (!resp.Success)
+                    throw new Exception($"{userFriendlyName}. Stream subscription error: {resp.ErrorDescription}");
+            }
+
+            return subscriptionInfo;
+        }
+
+       
 
         private bool AddSubscription(SubscriptionWrap sw)
         {
@@ -417,6 +443,8 @@ namespace PoissonSoft.KrakenApi.UserDataStream
         {
             public CommandRequest Request { get; }
 
+            public AddOrderPayload RequestOrder { get; }
+
             public ManualResetEventSlim SyncEvent { get; }
 
             public CommandResponse<object> Response { get; set; }
@@ -514,7 +542,6 @@ namespace PoissonSoft.KrakenApi.UserDataStream
             };
 
         }
-
 
         #endregion
 
