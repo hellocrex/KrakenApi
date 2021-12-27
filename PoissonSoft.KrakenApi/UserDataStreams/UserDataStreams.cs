@@ -11,17 +11,18 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PoissonSoft.KrakenApi.Contracts.MarketDataStream;
 using PoissonSoft.KrakenApi.Contracts.PrivateWebSocket;
+using PoissonSoft.KrakenApi.Contracts.PrivateWebSocket.Request;
 using PoissonSoft.KrakenApi.Contracts.PublicWebSocket;
 using PoissonSoft.KrakenApi.Contracts.UserData.Request;
 using PoissonSoft.KrakenApi.MarketDataStreams;
 using PoissonSoft.KrakenApi.Transport;
 using PoissonSoft.KrakenApi.Transport.Rest;
 using PoissonSoft.KrakenApi.Transport.Ws;
+using PoissonSoft.KrakenApi.UserDataStream;
 using PoissonSoft.KrakenApi.Utils;
 
-namespace PoissonSoft.KrakenApi.UserDataStream
+namespace PoissonSoft.KrakenApi.UserDataStreams
 {
-
     public class UserDataStreams : IUserDataStreams, IDisposable
     {
         private const string WS_ENDPOINT = "wss://ws-auth.kraken.com";
@@ -87,6 +88,7 @@ namespace PoissonSoft.KrakenApi.UserDataStream
             });
         }
 
+        /// <inheritdoc />
         public void Open()
         {
             if (WsConnectionStatus == DataStreamStatus.Active
@@ -175,32 +177,8 @@ namespace PoissonSoft.KrakenApi.UserDataStream
             return subscriptionInfo;
         }
 
-        public SubscriptionInfo SubscribeOnOpenOrders(Action<OHLCPayload> callbackAction)
-        {
-            var subscriptionInfo = new SubscriptionInfo
-            {
-                Id = GenerateUniqueId(),
-                Method = SubscribeMethodName.OpenOrders,
-            };
-            var subscriptionWrap = new SubscriptionWrap
-            {
-                Info = subscriptionInfo,
-                CallbackAction = callbackAction
-            };
-            var needSubscribeToStream = AddSubscription(subscriptionWrap);
-
-            if (needSubscribeToStream)
-            {
-                var resp = SubscribeToStream(subscriptionInfo);
-                if (!resp.Success)
-                    throw new Exception($"{userFriendlyName}. Stream subscription error: {resp.ErrorDescription}");
-            }
-
-            return subscriptionInfo;
-        }
-
         /// <inheritdoc />
-        public SubscriptionInfo AddNewOrder(Action<OHLCPayload> callbackAction)
+        public void AddNewOrder(AddOrderPayloadReq order, Action<AddOrderPayload> callbackAction)
         {
             var subscriptionInfo = new SubscriptionInfo
             {
@@ -212,19 +190,56 @@ namespace PoissonSoft.KrakenApi.UserDataStream
                 Info = subscriptionInfo,
                 CallbackAction = callbackAction
             };
-            var needSubscribeToStream = AddSubscription(subscriptionWrap);
-
-            if (needSubscribeToStream)
+            if (!subscriptions.TryGetValue(SubscribeMethodName.CancelAll, out _))
             {
-                var resp = SubscribeToStream(subscriptionInfo);
-                if (!resp.Success)
-                    throw new Exception($"{userFriendlyName}. Stream subscription error: {resp.ErrorDescription}");
+                AddSubscription(subscriptionWrap);
             }
 
-            return subscriptionInfo;
+            AddOrderToStream(order);
         }
 
-       
+        /// <inheritdoc />
+        public void CancelOrder(string[] cancelOrdersId, Action<CancelOrderPayload> callbackAction)
+        {
+            var subscriptionInfo = new SubscriptionInfo
+            {
+                Id = GenerateUniqueId(),
+                Method = SubscribeMethodName.CancelOrder,
+            };
+            var subscriptionWrap = new SubscriptionWrap
+            {
+                Info = subscriptionInfo,
+                CallbackAction = callbackAction
+            };
+            if (!subscriptions.TryGetValue(SubscribeMethodName.CancelAll, out _))
+            {
+                AddSubscription(subscriptionWrap);
+            }
+            CancelOrderToStream(cancelOrdersId);
+        }
+
+        /// <inheritdoc />
+        public void CancelAllOrders(Action<CancelOrderPayload> callbackAction)
+        {
+            var subscriptionInfo = new SubscriptionInfo
+            {
+                Id = GenerateUniqueId(),
+                Method = SubscribeMethodName.CancelAll,
+            };
+            var subscriptionWrap = new SubscriptionWrap
+            {
+                Info = subscriptionInfo,
+                CallbackAction = callbackAction
+            };
+            if (!subscriptions.TryGetValue(SubscribeMethodName.CancelAll, out _))
+            {
+                AddSubscription(subscriptionWrap);
+            }
+
+            CancelAllOrdersToStream();
+        }
+
+
 
         private bool AddSubscription(SubscriptionWrap sw)
         {
@@ -297,6 +312,7 @@ namespace PoissonSoft.KrakenApi.UserDataStream
                 },
                 RequestId = GenerateUniqueId()
             };
+            streamListener.SendMessage(JsonConvert.SerializeObject(request));
 
             var subscriptionResult = ProcessRequest<object>(request);
             if (subscriptionResult.Success)
@@ -307,6 +323,68 @@ namespace PoissonSoft.KrakenApi.UserDataStream
             return subscriptionResult;
         }
 
+        private void AddOrderToStream(AddOrderPayloadReq order)
+        {
+            while (!disposed && WsConnectionStatus != DataStreamStatus.Active)
+            {
+                Open();
+                if (WsConnectionStatus != DataStreamStatus.Active)
+                    Thread.Sleep(500);
+            }
+
+            AddOrderPayloadReq request = new AddOrderPayloadReq
+            {
+                Event = SubscribeMethodName.AddOrder,
+                Token = token,
+                OrderType = order.OrderType,
+                OrderSide = order.OrderSide,
+                Instrument = order.Instrument,
+                Price = order.Price,
+                Volume = order.Volume,
+                TimeInForce = order.TimeInForce,
+                RequestId = GenerateUniqueId()
+            };
+            streamListener.SendMessage(JsonConvert.SerializeObject(request));
+        }
+
+        private void CancelOrderToStream(string[] cancelOrdersId)
+        {
+            while (!disposed && WsConnectionStatus != DataStreamStatus.Active)
+            {
+                Open();
+                if (WsConnectionStatus != DataStreamStatus.Active)
+                    Thread.Sleep(500);
+            }
+
+            CancelOrderPayloadReq request = new CancelOrderPayloadReq
+            {
+                Event = SubscribeMethodName.CancelOrder,
+                TxId = cancelOrdersId,
+                Token = token,
+                RequestId = GenerateUniqueId()
+            };
+            streamListener.SendMessage(JsonConvert.SerializeObject(request));
+        }
+
+        private void CancelAllOrdersToStream()
+        {
+            while (!disposed && WsConnectionStatus != DataStreamStatus.Active)
+            {
+                Open();
+                if (WsConnectionStatus != DataStreamStatus.Active)
+                    Thread.Sleep(500);
+            }
+
+            CancelOrderPayloadReq request = new CancelOrderPayloadReq
+            {
+                Event = SubscribeMethodName.CancelAll,
+                Token = token,
+                RequestId = GenerateUniqueId()
+            };
+            streamListener.SendMessage(JsonConvert.SerializeObject(request));
+        }
+
+        /// <inheritdoc />
         public void Close()
         {
             if (WsConnectionStatus == DataStreamStatus.Closed) return;
@@ -443,7 +521,7 @@ namespace PoissonSoft.KrakenApi.UserDataStream
         {
             public CommandRequest Request { get; }
 
-            public AddOrderPayload RequestOrder { get; }
+            public AddOrderPayloadReq RequestOrder { get; }
 
             public ManualResetEventSlim SyncEvent { get; }
 
@@ -580,42 +658,38 @@ namespace PoissonSoft.KrakenApi.UserDataStream
             // Payload
             if (jToken.Type == JTokenType.Array)
             {
-                ProcessPayload(jToken);
+                string streamName = jToken[1]?.ToString();
+                ProcessPayload(jToken, streamName);
                 return;
             }
 
             var jObject = (JObject)jToken;
 
-
-            // Ответ на запрос
             if (jObject.ContainsKey("event"))
             {
                 var tMess = jObject["event"]?.ToString();
 
-                if (tMess == "heartbeat")
+                if (jObject["event"]?.ToString() == "heartbeat")
                 {
-
-                }
-
-                else if (tMess == "subscriptionStatus" && jObject["status"]?.ToString() == "error")
-                {
-                    apiClient.Logger.Debug($"{userFriendlyName}. New payload received:\n{JsonConvert.SerializeObject(jObject.ToObject<ResponseMessage>(), Formatting.Indented)}");
                     return;
                 }
 
-                // subscribed
-                else if (tMess == "subscriptionStatus" && jObject["status"]?.ToString() == "subscribed")
+                // subscription Status
+                if (tMess == "subscriptionStatus" && jObject["status"]?.ToString() != "error")
                 {
                     ProcessResponse(jObject);
+                    return;
                 }
+            }
 
-                // unsubscribed
-                else if (tMess == "subscriptionStatus" && jObject["status"]?.ToString() == "unsubscribed")
-                {
-                    ProcessResponse(jObject);
-                }
+            // Ответ на запрос
+            if (jObject.ContainsKey("status"))
+            {
+                if (jObject["status"]?.ToString() == "ok" || jObject["status"]?.ToString() == "error")
+                    ProcessPayload(jObject);
                 return;
             }
+
 
             // Ошибка
             var waitingRequests = responseWaiters.Values.ToArray().Select(x => JsonConvert.SerializeObject(x.Request));
@@ -628,9 +702,16 @@ namespace PoissonSoft.KrakenApi.UserDataStream
         /// Анализ сообщения с ответом на подписку
         /// </summary>
         /// <param name="streamData"></param>
-        private void ProcessPayload(JToken streamData)
+        /// <param name="streamName"></param>
+        private void ProcessPayload(JToken streamData, string streamName = null)
         {
-            string streamName = streamData[1]?.ToString();
+            if (streamName == null)
+            {
+                streamName = streamData["event"]?.ToString();
+                var pos = streamName.IndexOf("Status");
+                streamName = streamName.Remove(pos, streamName.Length - pos);
+            }
+
             if (string.IsNullOrWhiteSpace(streamName)) return;
 
             foreach (var subscriptionItem in subscriptions)
@@ -670,17 +751,34 @@ namespace PoissonSoft.KrakenApi.UserDataStream
                             {
                                 Console.WriteLine(e);
                             }
-                            
                             callback(r);
                         }
                     });
                     break;
-                case SubscribeMethodName.Trade:
+                case SubscribeMethodName.AddOrder:
                     activeSubscriptions.ForEach(sw =>
                     {
-                        if (sw.CallbackAction is Action<TradePayload> callback)
+                        if (sw.CallbackAction is Action<AddOrderPayload> callback)
                         {
-                            callback(streamData?.ToObject<TradePayload>());
+                            callback(streamData?.ToObject<AddOrderPayload>());
+                        }
+                    });
+                    break;
+                case SubscribeMethodName.CancelOrder:
+                    activeSubscriptions.ForEach(sw =>
+                    {
+                        if (sw.CallbackAction is Action<CancelOrderPayload> callback)
+                        {
+                            callback(streamData?.ToObject<CancelOrderPayload>());
+                        }
+                    });
+                    break;
+                case SubscribeMethodName.CancelAll:
+                    activeSubscriptions.ForEach(sw =>
+                    {
+                        if (sw.CallbackAction is Action<CancelOrderPayload> callback)
+                        {
+                            callback(streamData?.ToObject<CancelOrderPayload>());
                         }
                     });
                     break;
@@ -749,6 +847,7 @@ namespace PoissonSoft.KrakenApi.UserDataStream
 
         private bool disposed;
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (disposed) return;

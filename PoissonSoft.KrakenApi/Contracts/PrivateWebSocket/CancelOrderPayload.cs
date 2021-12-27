@@ -5,7 +5,7 @@ namespace PoissonSoft.KrakenApi.Contracts.PrivateWebSocket
     public class CancelOrderPayload
     {
         /// <summary>
-        /// addOrderStatus
+        /// cancelOrder
         /// </summary>
         [JsonProperty("event")]
         public string Event { get; set; }
@@ -14,7 +14,13 @@ namespace PoissonSoft.KrakenApi.Contracts.PrivateWebSocket
         /// Optional - client originated requestID sent as acknowledgment in the message response
         /// </summary>
         [JsonProperty("reqid", NullValueHandling = NullValueHandling.Ignore)]
-        public string ReqId { get; set; }
+        public long RequestId { get; set; }
+
+        /// <summary>
+        /// Number of orders cancelled.
+        /// </summary>
+        [JsonProperty("count", NullValueHandling = NullValueHandling.Ignore)]
+        public int? Count { get; set; }
 
         /// <summary>
         /// Status. "ok" or "error"
@@ -23,21 +29,9 @@ namespace PoissonSoft.KrakenApi.Contracts.PrivateWebSocket
         public string Status { get; set; }
 
         /// <summary>
-        /// order ID (if successful)
-        /// </summary>
-        [JsonProperty("txid")]
-        public string TxId { get; set; }
-
-        /// <summary>
-        /// order description info (if successful)
-        /// </summary>
-        [JsonProperty("descr")]
-        public string Descr { get; set; }
-
-        /// <summary>
         /// error message (if unsuccessful)
         /// </summary>
-        [JsonProperty("errorMessage")]
+        [JsonProperty("errorMessage", NullValueHandling = NullValueHandling.Ignore)]
         public string ErrorMessage { get; set; }
     }
 }

@@ -35,12 +35,12 @@ namespace PoissonSoft.KrakenApi.Contracts.UserTrading
         /// Order description
         /// </summary>
         [JsonProperty("order")]
-        public int Order{ get; set; }
+        public string Order{ get; set; }
 
         /// <summary>
         /// Conditional close order description, if applicable
         /// </summary>
         [JsonProperty("close")]
-        public int Close { get; set; }
+        public string Close { get; set; }
     }
 }

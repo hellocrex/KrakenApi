@@ -342,25 +342,6 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
             return subscriptionResult;
         }
 
-        private void OnPingTimer(object sender, ElapsedEventArgs e)
-        {
-            //Ping();
-        }
-
-        private void Ping()
-        {
-            if (!disposed && WsConnectionStatus == DataStreamStatus.Active)
-            {
-                CommandRequest request = new CommandRequest
-                {
-                    RequestId = GenerateUniqueId(),
-                    //Type = CommandRequestMethod.Ping
-                };
-
-                ProcessRequest<object>(request);
-            }
-        }
-
         public void Close()
         {
             if (WsConnectionStatus == DataStreamStatus.Closed) return;

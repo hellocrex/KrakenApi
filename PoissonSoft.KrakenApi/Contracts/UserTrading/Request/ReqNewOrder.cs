@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using PoissonSoft.KrakenApi.Contracts.Enums;
+using PoissonSoft.KrakenApi.Contracts.Serialization;
 
 namespace PoissonSoft.KrakenApi.Contracts.UserTrading.Request
 {
@@ -25,12 +26,14 @@ namespace PoissonSoft.KrakenApi.Contracts.UserTrading.Request
         /// User reference id
         /// </summary>
         [JsonProperty("ordertype")]
+        [JsonConverter(typeof(StringEnumExConverter), OrderType.Unknown)]
         public OrderType OrderType { get; set; }
 
         /// <summary>
         /// Order direction (buy/sell)
         /// </summary>
         [JsonProperty("type")]
+        [JsonConverter(typeof(StringEnumExConverter), OrderSide.Unknown)]
         public OrderSide OrderSide { get; set; }
 
         /// <summary>
@@ -73,6 +76,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserTrading.Request
         /// Time-in-force of the order to specify how long it should remain in the order book before being cancelled.
         /// </summary>
         [JsonProperty("timeinforce", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringEnumExConverter), Enums.TimeInForce.Unknown)]
         public TimeInForce? TimeInForce { get; set; }
 
         /// <summary>
