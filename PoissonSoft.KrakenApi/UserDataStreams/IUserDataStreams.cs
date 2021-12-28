@@ -1,11 +1,10 @@
 ﻿using System;
 using PoissonSoft.KrakenApi.Contracts.PrivateWebSocket;
 using PoissonSoft.KrakenApi.Contracts.PrivateWebSocket.Request;
-using PoissonSoft.KrakenApi.Contracts.PublicWebSocket;
 using PoissonSoft.KrakenApi.MarketDataStreams;
 using PoissonSoft.KrakenApi.Transport;
 
-namespace PoissonSoft.KrakenApi.UserDataStream
+namespace PoissonSoft.KrakenApi.UserDataStreams
 {
     public interface IUserDataStreams
     {
@@ -22,7 +21,7 @@ namespace PoissonSoft.KrakenApi.UserDataStream
         /// <summary>
         /// Add new order.
         /// </summary>
-        /// <param name="instrument"></param>
+        /// <param name="request"></param>
         /// <param name="callbackAction"></param>
         /// <returns></returns>
         void AddNewOrder(AddOrderPayloadReq request, Action<AddOrderPayload> callbackAction);
@@ -30,7 +29,7 @@ namespace PoissonSoft.KrakenApi.UserDataStream
         /// <summary>
         /// Cancel order or list of orders.
         /// </summary>
-        /// <param name="order"></param>
+        /// <param name="cancelOrdersId"></param>
         /// <param name="callbackAction"></param>
         void CancelOrder(string[] cancelOrdersId, Action<CancelOrderPayload> callbackAction);
 

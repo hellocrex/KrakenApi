@@ -3,7 +3,6 @@ using PoissonSoft.KrakenApi.MarketData;
 using PoissonSoft.KrakenApi.MarketDataStreams;
 using PoissonSoft.KrakenApi.Transport;
 using PoissonSoft.KrakenApi.Userdata;
-using PoissonSoft.KrakenApi.UserDataStream;
 using PoissonSoft.KrakenApi.UserDataStreams;
 using PoissonSoft.KrakenApi.UserFunding;
 using PoissonSoft.KrakenApi.UserTrade;

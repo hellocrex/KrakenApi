@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace PoissonSoft.KrakenApi.Contracts.MarketData
 {
@@ -12,16 +11,18 @@ namespace PoissonSoft.KrakenApi.Contracts.MarketData
         public string[] Error { get; set; }
 
         [JsonProperty("result")]
+        //public Dictionary<string, OHLCDataResult> Result { get; set; }
         public OHLCDataResult Result { get; set; }
     }
 
     public class OHLCDataResult
     {
         public object[][] XXBTZUSD { get; set; }
-        //public Dictionary<string[], object>[][] XXBTZUSD { get; set; }
+        //public object[][] Tick { get; set; }
+        //public Dictionary<string, string[]> XXBTZUSD { get; set; }
 
         [JsonProperty("last")]
-        public int last { get; set; }
+        public int Last { get; set; }
     }
 
 }

@@ -18,7 +18,6 @@ using PoissonSoft.KrakenApi.MarketDataStreams;
 using PoissonSoft.KrakenApi.Transport;
 using PoissonSoft.KrakenApi.Transport.Rest;
 using PoissonSoft.KrakenApi.Transport.Ws;
-using PoissonSoft.KrakenApi.UserDataStream;
 using PoissonSoft.KrakenApi.Utils;
 
 namespace PoissonSoft.KrakenApi.UserDataStreams
@@ -113,7 +112,6 @@ namespace PoissonSoft.KrakenApi.UserDataStreams
 
                 apiClient.Logger.Error($"{userFriendlyName}. Can not get token. Exception:\n{e}");
                 WsConnectionStatus = DataStreamStatus.Closed;
-                return;
             }
             TryConnectToWebSocket(token);
         }
