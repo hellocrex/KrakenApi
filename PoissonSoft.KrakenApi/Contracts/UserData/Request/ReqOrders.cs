@@ -33,13 +33,13 @@ namespace PoissonSoft.KrakenApi.Contracts.UserData.Request
         /// Starting unix timestamp or order tx ID of results (exclusive)
         /// </summary>
         [JsonProperty("start", NullValueHandling = NullValueHandling.Ignore)]
-        public int? StartTimeStamp { get; set; }
+        public long? StartTimeStamp { get; set; }
 
         /// <summary>
         /// Ending unix timestamp or order tx ID of results (inclusive)
         /// </summary>
         [JsonProperty("end", NullValueHandling = NullValueHandling.Ignore)]
-        public int? EndTimeStamp { get; set; }
+        public long? EndTimeStamp { get; set; }
 
         /// <summary>
         /// Result offset for pagination

@@ -9,7 +9,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserData
         public string[] Error { get; set; }
 
         [JsonProperty("result")]
-        public Dictionary<string, string> Result { get; set; }
+        public Dictionary<string, decimal> Result { get; set; }
     }
 
 }

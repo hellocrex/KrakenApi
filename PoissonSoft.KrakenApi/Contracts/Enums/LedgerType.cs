@@ -24,7 +24,7 @@ namespace PoissonSoft.KrakenApi.Contracts.Enums
         /// <summary>
         /// 
         /// </summary>
-        [EnumMember(Value = "withdraw")]
+        [EnumMember(Value = "withdrawal")]
         Withdraw,
 
         /// <summary>

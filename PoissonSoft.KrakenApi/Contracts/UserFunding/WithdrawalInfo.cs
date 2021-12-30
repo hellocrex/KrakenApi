@@ -11,7 +11,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserFunding
         public string[] Error { get; set; }
         
         [JsonProperty("result")]
-        public WithdrawalInfoResult[] Result { get; set; }
+        public WithdrawalInfoResult Result { get; set; }
     }
 
     /// <summary>

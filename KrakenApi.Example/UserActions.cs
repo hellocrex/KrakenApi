@@ -42,11 +42,11 @@ namespace KrakenApi.Example
                 case ConsoleKey.A:
                     SafeCall(() =>
                     {
-                        for (int i = 0; i < 500; i++)
-                        {
+                        //for (int i = 0; i < 500; i++)
+                        //{
                             var accountBalanceInfo = apiClient.UserDataApi.GetAccountBalance(new ReqEmpty());
                             Console.WriteLine(JsonConvert.SerializeObject(accountBalanceInfo, Formatting.Indented));
-                        }
+                        //}
                         
                     });
                     return true;
@@ -288,7 +288,7 @@ namespace KrakenApi.Example
                         {
                             Ticker = InputHelper.GetString("Ticker: "),
                             Method = InputHelper.GetString("Name of the deposit method: "),
-                            New = true
+                            New = false
                         };
                         var depositAddressesInfo = apiClient.UserFundingApi.GetDepositAddresses(req);
                         Console.WriteLine(JsonConvert.SerializeObject(depositAddressesInfo, Formatting.Indented));

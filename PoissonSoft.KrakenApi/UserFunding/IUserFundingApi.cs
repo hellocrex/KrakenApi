@@ -24,7 +24,7 @@ namespace PoissonSoft.KrakenApi.UserFunding
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        SatatusOfRecent GetStatusOfRecentDeposits(ReqStatusOfRecent req);
+        StatusOfRecent GetStatusOfRecentDeposits(ReqStatusOfRecent req);
 
         /// <summary>
         /// Retrieve fee information about potential withdrawals for a particular asset, key and amount.
@@ -45,7 +45,7 @@ namespace PoissonSoft.KrakenApi.UserFunding
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        SatatusOfRecent GetStatusOfRecentWithdrawals(ReqStatusOfRecent req);
+        StatusOfRecent GetStatusOfRecentWithdrawals(ReqStatusOfRecent req);
 
         /// <summary>
         /// Cancel a recently requested withdrawal, if it has not already been successfully processed.

@@ -34,9 +34,9 @@ namespace PoissonSoft.KrakenApi.UserFunding
         }
 
         /// <inheritdoc />
-        public SatatusOfRecent GetStatusOfRecentDeposits(ReqStatusOfRecent req)
+        public StatusOfRecent GetStatusOfRecentDeposits(ReqStatusOfRecent req)
         {
-            return client.MakeRequest<SatatusOfRecent>(new RequestParameters(HttpMethod.Post, "0/private/DepositStatus", 1, req));
+            return client.MakeRequest<StatusOfRecent>(new RequestParameters(HttpMethod.Post, "0/private/DepositStatus", 1, req));
         }
 
         /// <inheritdoc />
@@ -52,9 +52,9 @@ namespace PoissonSoft.KrakenApi.UserFunding
         }
 
         /// <inheritdoc />
-        public SatatusOfRecent GetStatusOfRecentWithdrawals(ReqStatusOfRecent req)
+        public StatusOfRecent GetStatusOfRecentWithdrawals(ReqStatusOfRecent req)
         {
-            return client.MakeRequest<SatatusOfRecent>(new RequestParameters(HttpMethod.Post, "0/private/WithdrawStatus", 1, req));
+            return client.MakeRequest<StatusOfRecent>(new RequestParameters(HttpMethod.Post, "0/private/WithdrawStatus", 1, req));
         }
 
         /// <inheritdoc />

@@ -6,7 +6,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserFunding
     /// <summary>
     /// Retrieve information about recent deposits and withdrawals made.
     /// </summary>
-    public class SatatusOfRecent
+    public class StatusOfRecent
     {
         [JsonProperty("error")]
         public string[] Error { get; set; }
@@ -78,7 +78,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserFunding
         /// Status of deposit
         /// </summary>
         [JsonProperty("status")]
-        public string Status { get; set; }
+        public DepositAndWithdrawStatus Status { get; set; }
 
         /// <summary>
         /// Addition status properties 

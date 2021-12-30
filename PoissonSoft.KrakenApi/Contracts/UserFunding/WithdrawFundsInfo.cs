@@ -11,7 +11,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserFunding
         public string[] Error { get; set; }
         
         [JsonProperty("result")]
-        public WithdrawFundsResult[] Result { get; set; }
+        public WithdrawFundsResult Result { get; set; }
     }
 
     /// <summary>
@@ -25,5 +25,4 @@ namespace PoissonSoft.KrakenApi.Contracts.UserFunding
         [JsonProperty("refid")]
         public string RefId { get; set; }
     }
-
 }

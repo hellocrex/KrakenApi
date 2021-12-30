@@ -27,7 +27,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserData
         /// Unix timestamp of trade
         /// </summary>
         [JsonProperty("time")]
-        public string Time { get; set; }
+        public decimal Time { get; set; }
 
         /// <summary>
         /// Type of order (buy/sell)
