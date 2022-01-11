@@ -42,12 +42,11 @@ namespace KrakenApi.Example
                 case ConsoleKey.A:
                     SafeCall(() =>
                     {
-                        //for (int i = 0; i < 500; i++)
-                        //{
+                        for (int i = 0; i < 500; i++)
+                        {
                             var accountBalanceInfo = apiClient.UserDataApi.GetAccountBalance(new ReqEmpty());
                             Console.WriteLine(JsonConvert.SerializeObject(accountBalanceInfo, Formatting.Indented));
-                        //}
-                        
+                        }
                     });
                     return true;
 
@@ -103,7 +102,7 @@ namespace KrakenApi.Example
                 case ConsoleKey.F:
                     SafeCall(() =>
                     {
-                        for (int i = 1; i < 9; i++)
+                        for (int i = 1; i < 18; i++)
                         {
                             var req = new ReqOrders
                             {
@@ -122,7 +121,9 @@ namespace KrakenApi.Example
                     {
                         var req = new ReqTrades
                         {
-                            Txid = InputHelper.GetString("Comma delimited list of transaction IDs to query info about (20 maximum): ")
+                            TxId = InputHelper.GetString(
+                                "Comma delimited list of transaction IDs to query info about (20 maximum): "),
+                            Trades = true
                         };
                         var queryTradesInfo = apiClient.UserDataApi.QueryTradesInfo(req);
                         Console.WriteLine(JsonConvert.SerializeObject(queryTradesInfo, Formatting.Indented));
@@ -132,8 +133,11 @@ namespace KrakenApi.Example
                 case ConsoleKey.I:
                     SafeCall(() =>
                     {
-                        var ledgersInfoInfo = apiClient.UserDataApi.GetLedgersInfo(new ReqOrders());
-                        Console.WriteLine(JsonConvert.SerializeObject(ledgersInfoInfo, Formatting.Indented));
+                        for (int i = 1; i < 18; i++)
+                        {
+                            var ledgersInfoInfo = apiClient.UserDataApi.GetLedgersInfo(new ReqOrders());
+                            Console.WriteLine(JsonConvert.SerializeObject(ledgersInfoInfo, Formatting.Indented));
+                        }
                     });
                     return true;
 
@@ -202,8 +206,8 @@ namespace KrakenApi.Example
                             Volume = InputHelper.GetDecimal("Order quantity in terms of the base asset"),
                             Price = InputHelper.GetDecimal("Price")
                         };
-                        var exchangeInfo = apiClient.UserTradeApi.AddNewOrder(req);
-                        Console.WriteLine(JsonConvert.SerializeObject(exchangeInfo, Formatting.Indented));
+                        var orderInfo = apiClient.UserTradeApi.AddNewOrder(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(orderInfo, Formatting.Indented));
                     });
                     return true;
 

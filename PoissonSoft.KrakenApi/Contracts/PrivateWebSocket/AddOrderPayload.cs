@@ -13,7 +13,7 @@ namespace PoissonSoft.KrakenApi.Contracts.PrivateWebSocket
         /// <summary>
         /// Optional - client originated requestID sent as acknowledgment in the message response
         /// </summary>
-        [JsonProperty("reqid", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("reqid")]
         public long RequestId { get; set; }
 
         /// <summary>
@@ -25,19 +25,19 @@ namespace PoissonSoft.KrakenApi.Contracts.PrivateWebSocket
         /// <summary>
         /// order ID (if successful)
         /// </summary>
-        [JsonProperty("txid", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("txid")]
         public string TxId { get; set; }
 
         /// <summary>
         /// order description info (if successful)
         /// </summary>
-        [JsonProperty("descr", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("descr")]
         public string Description { get; set; }
 
         /// <summary>
         /// error message (if unsuccessful)
         /// </summary>
-        [JsonProperty("errorMessage", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("errorMessage")]
         public string ErrorMessage { get; set; }
     }
 }

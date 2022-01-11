@@ -40,6 +40,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserTrading.Request
         /// Order quantity in terms of the base asset
         /// </summary>
         [JsonProperty("volume", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DecimalToStringConverter))]
         public decimal? Volume { get; set; }
 
         /// <summary>
@@ -52,12 +53,14 @@ namespace PoissonSoft.KrakenApi.Contracts.UserTrading.Request
         /// Price
         /// </summary>
         [JsonProperty("price", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DecimalToStringConverter))]
         public decimal? Price { get; set; }
 
         /// <summary>
         /// Secondary Price
         /// </summary>
         [JsonProperty("price2", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DecimalToStringConverter))]
         public decimal? Price2 { get; set; }
 
         /// <summary>
@@ -104,12 +107,14 @@ namespace PoissonSoft.KrakenApi.Contracts.UserTrading.Request
         /// Conditional close order price
         /// </summary>
         [JsonProperty("close[price]", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DecimalToStringConverter))]
         public decimal? ClosePrice { get; set; }
 
         /// <summary>
         /// Conditional close order price
         /// </summary>
         [JsonProperty("close[price2]", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(DecimalToStringConverter))]
         public decimal? ClosePrice2 { get; set; }
 
         /// <summary>

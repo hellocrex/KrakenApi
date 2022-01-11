@@ -120,6 +120,6 @@ namespace PoissonSoft.KrakenApi.Contracts.MarketData
         /// Minimum order size (in terms of base currency)
         /// </summary>
         [JsonProperty("ordermin")]
-        public string Ordermin { get; set; }
+        public decimal Ordermin { get; set; }
     }
 }

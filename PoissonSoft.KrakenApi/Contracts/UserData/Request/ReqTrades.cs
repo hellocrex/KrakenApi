@@ -21,7 +21,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserData.Request
         /// Comma delimited list of transaction IDs to query info about (20 maximum)
         /// </summary>
         [JsonProperty("txid", NullValueHandling = NullValueHandling.Ignore)]
-        public string Txid { get; set; }
+        public string TxId { get; set; }
 
         /// <summary>
         /// Whether or not to include trades related to position in output

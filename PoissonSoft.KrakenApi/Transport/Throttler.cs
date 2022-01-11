@@ -25,7 +25,6 @@ namespace PoissonSoft.KrakenApi.Transport
 
         private Dictionary<FeedLocker, DateTimeOffset> actualFeedLockerDictionary =
             new Dictionary<FeedLocker, DateTimeOffset>();
-
         // "Стоимость" одного бала в миллисекундах для каждого из параллельно исполняемых REST-запросов.
         // Т.е. если в конкретном потоке (одном из всех MaxDegreeOfParallelism параллельных) выполняется запрос
         // с весом 1 балл, то этот поток не должен проводить новых запросов в течение requestWeightCostInMs миллисекунд
@@ -84,7 +83,7 @@ namespace PoissonSoft.KrakenApi.Transport
         /// <param name="maxWeigthRequest"></param>
         public void CalculateWeightUnitCost( int maxWeigthRequest)
         {
-            var minWeightPerSecondLimit = (maxWeigthRequest / 0.30) * 1000;
+            var minWeightPerSecondLimit = (maxWeigthRequest / 0.33) * 1000;
             Interlocked.Exchange(ref weightUnitCostInMs, (int)minWeightPerSecondLimit);
         }
 
@@ -103,29 +102,31 @@ namespace PoissonSoft.KrakenApi.Transport
 
             var tmpLockers = new FeedLocker[actualFeedLockerCounter.Count];
             actualFeedLockerCounter.CopyTo(tmpLockers);
-            var tmpLockerList = new List<FeedLocker>();
-            foreach (var tmpLocker in tmpLockers)
-            {
-                tmpLockerList.Add(tmpLocker);
-            }
 
-            foreach (var item in tmpLockerList)
-            {
-                if (actualFeedLockerDictionary[item] <= DateTimeOffset.Now)
-                {
-                    actualFeedLockerCounter.Remove(item);
-                    actualFeedLockerDictionary.Remove(item);
-                }
-            }
-            
             locker.UnlockAfterMs(weightUnitCostInMs * (actualFeedLockerCounter.Count + 1));
 
-            actualFeedLockerCounter.Add(locker);
-            actualFeedLockerDictionary.Add(locker, dt.AddMilliseconds(weightUnitCostInMs * (actualFeedLockerCounter.Count + 1)));
+            if (actualFeedLockerDictionary.ContainsKey(locker) && actualFeedLockerDictionary[locker] <= DateTimeOffset.Now)
+            {
+                actualFeedLockerCounter.Remove(locker);
+                actualFeedLockerDictionary.Remove(locker);
+            }
+
+            try
+            {
+                if (!actualFeedLockerDictionary.ContainsKey(locker))
+                {
+                    actualFeedLockerCounter.Add(locker);
+                    actualFeedLockerDictionary.Add(locker, dt.AddMilliseconds(weightUnitCostInMs * (actualFeedLockerCounter.Count + 1)));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 
 
             var waitTime = (DateTimeOffset.UtcNow - dt).TotalSeconds;
-            if (waitTime > 8)
+            if (waitTime > 7)
             {
                 apiClient.Logger.Warn($"{userFriendlyName}. Время ожидания тротлинга REST-запроса составило {waitTime:F0} секунд. " +
                                       "Возможно, следует оптимизировать прикладные алгоритмы с целью сокращения количества запросов");
