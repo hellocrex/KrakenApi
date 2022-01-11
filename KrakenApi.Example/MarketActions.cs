@@ -16,6 +16,7 @@ namespace KrakenApi.Example
         {
             var actions = new Dictionary<ConsoleKey, string>
             {
+                [ConsoleKey.A] = "Get Asset Info",
                 [ConsoleKey.C] = "Tradable Asset Pairs Information",
                 [ConsoleKey.I] = "Ticker Information",
                 [ConsoleKey.B] = "OHCL Data",
@@ -27,6 +28,18 @@ namespace KrakenApi.Example
 
             switch (selectedAction)
             {
+                case ConsoleKey.A:
+                    SafeCall(() =>
+                    {
+                        var req = new ReqAssetInfo()
+                        {
+                            Ticker = InputHelper.GetString("Ticker: ")
+                        };
+                        var AssetInfo = apiClient.MarketDataApi.GetAssetInfo(req);
+                        Console.WriteLine(JsonConvert.SerializeObject(AssetInfo, Formatting.Indented));
+                    });
+                    return true;
+
                 case ConsoleKey.C:
                     SafeCall(() =>
                     {

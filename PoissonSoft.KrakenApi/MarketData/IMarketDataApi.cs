@@ -6,6 +6,14 @@ namespace PoissonSoft.KrakenApi.MarketData
     public interface IMarketDataApi
     {
         /// <summary>
+        /// Get information about the assets that are available for
+        /// deposit, withdrawal, trading and staking.
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        Asset GetAssetInfo(ReqAssetInfo req);
+
+        /// <summary>
         /// Get tradable asset pairs
         /// </summary>
         /// <param name="req"></param>

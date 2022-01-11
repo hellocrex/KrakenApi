@@ -24,6 +24,12 @@ namespace PoissonSoft.KrakenApi.MarketData
         }
 
         #region Market Data
+
+        public Asset GetAssetInfo(ReqAssetInfo req)
+        {
+            return client.MakeRequest<Asset>(new RequestParameters(HttpMethod.Get, "0/public/Assets", 1, req));
+        }
+
         public InstrumentInformation GetTradableAssetPairs(ReqInstrumentInformation req)
         {
             return client.MakeRequest<InstrumentInformation>(new RequestParameters(HttpMethod.Get, "0/public/AssetPairs", 1, req));
