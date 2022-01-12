@@ -24,7 +24,7 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
     public class MarketDataStreams : IMarketDataStreams, IDisposable
     {
         private const string WS_ENDPOINT = "wss://ws.kraken.com";
-        
+
         private readonly RestClient RestClient;
 
         private readonly KrakenApiClient apiClient;
@@ -279,7 +279,7 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
         private string ArrayToStr(string[] array)
         {
             string result = null;
-            for (int i = 0; i <= array.Length-1; i++)
+            for (int i = 0; i <= array.Length - 1; i++)
             {
                 result = result + array[i];
             }
@@ -427,7 +427,7 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
             {
                 Success = true
             };
-            
+
             CommandRequest request = new CommandRequest
             {
                 Event = CommandRequestMethod.Unsubscribe,
@@ -716,7 +716,7 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
                                 Console.WriteLine(e);
                                 throw;
                             }
-                            
+
                             callback(r);
                         }
                     });
@@ -751,7 +751,7 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
                                 Console.WriteLine(e);
                                 throw;
                             }
-                            
+
                             callback(r);
                         }
                     });
@@ -786,7 +786,7 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
 
                             r.ChannelName = streamData[2]?.ToString();
                             r.Instrument = streamData[3]?.ToString();
-                            
+
                             callback(r);
                         }
                     });
@@ -802,14 +802,14 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
 
                             r.SpreadInfo = new SpreadInfo[1];
                             var itemContent = streamData[1].ToObject<decimal[]>();
-                            
+
                             r.SpreadInfo[0] = new SpreadInfo();
                             r.SpreadInfo[0].Ask = itemContent[0];
                             r.SpreadInfo[0].Bid = itemContent[1];
                             r.SpreadInfo[0].Timestamp = itemContent[2];
                             r.SpreadInfo[0].BidVolume = itemContent[3];
                             r.SpreadInfo[0].AskVolume = itemContent[4];
-                            
+
                             r.ChannelName = streamData[2]?.ToString();
                             r.Instrument = streamData[3]?.ToString();
                             callback(r);
@@ -833,15 +833,18 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
                                 // Asks update
                                 if (orderBookItems.First().Path.Contains("a") && !orderBookItems.First().Path.Contains("as"))
                                 {
-                                    var askContent = streamData[1].First().First?.ToObject<decimal[][]>();
                                     r.Orderbook[0] = new OrkerBook();
+                                    var askContent = streamData[1].First().First?.ToObject<decimal[][]>();
                                     r.Orderbook[0].Ask = new OrderAsk[askContent.Length];
+                                    //r.Orderbook[0].Bid = new OrderAsk[askContent.Length];
                                     for (int i = 0; i < askContent.Length; i++)
                                     {
                                         r.Orderbook[0].Ask[i] = new OrderAsk();
                                         r.Orderbook[0].Ask[i].Price = askContent[i][0];
                                         r.Orderbook[0].Ask[i].Volume = askContent[i][1];
                                         r.Orderbook[0].Ask[i].Time = askContent[i][2];
+
+                                        //r.Orderbook[0].Bid[i] = new OrderAsk();
                                     }
                                 }
                             }
@@ -854,11 +857,14 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
                                 // Bids update
                                 if (orderBookItems.First().Path.Contains("b") && !orderBookItems.First().Path.Contains("bs"))
                                 {
-                                    var bidContent = streamData[1].First().First?.ToObject<decimal[][]>();
                                     r.Orderbook[0] = new OrkerBook();
+                                    var bidContent = streamData[1].First().First?.ToObject<decimal[][]>();
+                                    //r.Orderbook[0].Ask = new OrderAsk[bidContent.Length];
                                     r.Orderbook[0].Bid = new OrderAsk[bidContent.Length];
                                     for (int i = 0; i < bidContent.Length; i++)
                                     {
+                                        //r.Orderbook[0].Ask[i] = new OrderAsk();
+
                                         r.Orderbook[0].Bid[i] = new OrderAsk();
                                         r.Orderbook[0].Bid[i].Price = bidContent[i][0];
                                         r.Orderbook[0].Bid[i].Volume = bidContent[i][1];
@@ -869,7 +875,7 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
                             catch (Exception e)
                             {
                             }
-                            
+
 
                             // full snapshot
                             if (orderBookItems.First().Path.Contains("as") ||
