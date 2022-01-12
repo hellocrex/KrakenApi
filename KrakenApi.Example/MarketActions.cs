@@ -108,7 +108,8 @@ namespace KrakenApi.Example
                 [ConsoleKey.C] = "Subscribe on trade",
                 [ConsoleKey.D] = "Subscribe on spread",
                 [ConsoleKey.E] = "Subscribe on OrderBook",
-                [ConsoleKey.F] = "Unsubscribe all",
+                [ConsoleKey.F] = "Unsubscribe",
+                [ConsoleKey.G] = "Unsubscribe all",
 
                 [ConsoleKey.Escape] = "Go back (to main menu)",
             };
@@ -147,6 +148,10 @@ namespace KrakenApi.Example
                     return true;
 
                 case ConsoleKey.F:
+                    Unsubscribe();
+                    return true;
+
+                case ConsoleKey.G:
                     UnsubscribeAll();
                     return true;
 
@@ -239,12 +244,25 @@ namespace KrakenApi.Example
             }
         }
 
+        private void Unsubscribe()
+        {
+            var id = InputHelper.GetLong("Unsubscribe id: ");
+            try
+            {
+                var UnsubscribeInfo = apiClient.MarketStreamManager.Unsubscribe(id);
+                Console.WriteLine($"Subscription Info:\n{JsonConvert.SerializeObject(UnsubscribeInfo, Formatting.Indented)}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
         private void UnsubscribeAll()
         {
             try
             {
                 apiClient.MarketStreamManager.UnsubscribeAll();
-
                 //Console.WriteLine($"Subscription Info:\n{JsonConvert.SerializeObject(subscriptionInfo, Formatting.Indented)}");
             }
             catch (Exception e)

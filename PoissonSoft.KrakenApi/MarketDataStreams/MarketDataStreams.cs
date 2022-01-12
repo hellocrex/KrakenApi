@@ -363,6 +363,35 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
         }
 
         /// <inheritdoc />
+        public bool Unsubscribe(long subscriptionId)
+        {
+            var streams = subscriptions.Keys.ToArray();
+            foreach (var streamKey in streams)
+            {
+                if (!subscriptions.TryGetValue(streamKey, out var subscriptionsByKey)
+                    || !subscriptionsByKey.ContainsKey(subscriptionId)) continue;
+
+                var t = subscriptionsByKey.Where(x => x.Value.Info.Id == subscriptionId).Select(c => c.Value.Info).ToArray();
+                var resp = UnsubscribeStream(t.First());
+                if (!subscriptionsByKey.TryRemove(subscriptionId, out _)) return true;
+
+                if (!subscriptionsByKey.IsEmpty) return true;
+
+                if (!subscriptions.TryRemove(streamKey, out _)) return true;
+
+                if (!resp.Success)
+                {
+                    apiClient.Logger.Error($"{userFriendlyName}. Stream unsubscription error: {resp.ErrorDescription}");
+                }
+
+                return resp.Success;
+            }
+
+            apiClient.Logger.Error($"{userFriendlyName}. Не удалось отписаться от подписки {subscriptionId}");
+            return false;
+        }
+
+        /// <inheritdoc />
         public void UnsubscribeAll()
         {
             if (WsConnectionStatus == DataStreamStatus.Active)

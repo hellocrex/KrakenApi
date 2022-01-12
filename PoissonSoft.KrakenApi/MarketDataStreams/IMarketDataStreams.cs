@@ -48,5 +48,12 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
         /// <param name="callbackAction"></param>
         /// <returns></returns>
         SubscriptionInfo SubscribeBook(string[] instruments, Action<OrderBookPayload> callbackAction);
+
+        /// <summary>
+        /// Отписаться от рассылки
+        /// </summary>
+        /// <param name="subscriptionId"></param>
+        /// <returns></returns>
+        bool Unsubscribe(long subscriptionId);
     }
 }
