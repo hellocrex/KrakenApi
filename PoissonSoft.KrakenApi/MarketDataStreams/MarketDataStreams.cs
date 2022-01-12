@@ -797,33 +797,78 @@ namespace PoissonSoft.KrakenApi.MarketDataStreams
                             r.ChannelID = Convert.ToInt32(streamData[0]);
 
                             var orderBookItems = streamData[1].ToArray();
-
                             r.Orderbook = new OrkerBook[1];
-                            
-                            
-                            for (int j = 0; j < 1; j++)
-                            {
-                                var askContent = orderBookItems[j].First?.ToObject<decimal[][]>();
-                                var bidContent = orderBookItems[j+1].First?.ToObject<decimal[][]>();
-                                r.Orderbook[j] = new OrkerBook();
-                                r.Orderbook[j].Ask = new OrderAsk[askContent.Length];
-                                r.Orderbook[j].Bid = new OrderAsk[askContent.Length];
 
-                                for (int i = 0; i < askContent.Length; i++)
+                            try
+                            {
+                                // Asks update
+                                if (orderBookItems.First().Path.Contains("a") && !orderBookItems.First().Path.Contains("as"))
                                 {
-                                    // Asks
-                                    r.Orderbook[j].Ask[i] = new OrderAsk();
-                                    r.Orderbook[j].Ask[i].Price = askContent[i][0];
-                                    r.Orderbook[j].Ask[i].Volume = askContent[i][1];
-                                    r.Orderbook[j].Ask[i].Time = askContent[i][2];
-                                    // Bids
-                                    r.Orderbook[j].Bid[i] = new OrderAsk();
-                                    r.Orderbook[j].Bid[i].Price = bidContent[i][0];
-                                    r.Orderbook[j].Bid[i].Volume = bidContent[i][1];
-                                    r.Orderbook[j].Bid[i].Time = bidContent[i][2];
+                                    var askContent = streamData[1].First().First?.ToObject<decimal[][]>();
+                                    r.Orderbook[0] = new OrkerBook();
+                                    r.Orderbook[0].Ask = new OrderAsk[askContent.Length];
+                                    for (int i = 0; i < askContent.Length; i++)
+                                    {
+                                        r.Orderbook[0].Ask[i] = new OrderAsk();
+                                        r.Orderbook[0].Ask[i].Price = askContent[i][0];
+                                        r.Orderbook[0].Ask[i].Volume = askContent[i][1];
+                                        r.Orderbook[0].Ask[i].Time = askContent[i][2];
+                                    }
                                 }
                             }
+                            catch (Exception e)
+                            {
+                            }
+
+                            try
+                            {
+                                // Bids update
+                                if (orderBookItems.First().Path.Contains("b") && !orderBookItems.First().Path.Contains("bs"))
+                                {
+                                    var bidContent = streamData[1].First().First?.ToObject<decimal[][]>();
+                                    r.Orderbook[0] = new OrkerBook();
+                                    r.Orderbook[0].Bid = new OrderAsk[bidContent.Length];
+                                    for (int i = 0; i < bidContent.Length; i++)
+                                    {
+                                        r.Orderbook[0].Bid[i] = new OrderAsk();
+                                        r.Orderbook[0].Bid[i].Price = bidContent[i][0];
+                                        r.Orderbook[0].Bid[i].Volume = bidContent[i][1];
+                                        r.Orderbook[0].Bid[i].Time = bidContent[i][2];
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                            }
                             
+
+                            // full snapshot
+                            if (orderBookItems.First().Path.Contains("as") ||
+                                orderBookItems.First().Path.Contains("bs"))
+                            {
+                                for (int j = 0; j < 1; j++)
+                                {
+                                    var askContent = orderBookItems[j].First?.ToObject<decimal[][]>();
+                                    var bidContent = orderBookItems[j + 1].First?.ToObject<decimal[][]>();
+                                    r.Orderbook[j] = new OrkerBook();
+                                    r.Orderbook[j].Ask = new OrderAsk[askContent.Length];
+                                    r.Orderbook[j].Bid = new OrderAsk[askContent.Length];
+
+                                    for (int i = 0; i < askContent.Length; i++)
+                                    {
+                                        // Asks
+                                        r.Orderbook[j].Ask[i] = new OrderAsk();
+                                        r.Orderbook[j].Ask[i].Price = askContent[i][0];
+                                        r.Orderbook[j].Ask[i].Volume = askContent[i][1];
+                                        r.Orderbook[j].Ask[i].Time = askContent[i][2];
+                                        // Bids
+                                        r.Orderbook[j].Bid[i] = new OrderAsk();
+                                        r.Orderbook[j].Bid[i].Price = bidContent[i][0];
+                                        r.Orderbook[j].Bid[i].Volume = bidContent[i][1];
+                                        r.Orderbook[j].Bid[i].Time = bidContent[i][2];
+                                    }
+                                }
+                            }
                             r.ChannelName = streamData[2]?.ToString();
                             r.Instrument = streamData[3]?.ToString();
                             callback(r);
