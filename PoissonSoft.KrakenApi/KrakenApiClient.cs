@@ -77,5 +77,18 @@ namespace KrakenApi
         public bool IsDebug { get; set; } = false;
 
         internal Throttler Throttler { get; }
+
+        public void Dispose()
+        {
+            if (userStreamManager?.WsConnectionStatus == DataStreamStatus.Active) userStreamManager.Close();
+            userStreamManager?.Dispose();
+            marketStreamManager?.Dispose();
+            userFundingApi?.Dispose();
+            marketDataApi?.Dispose();
+            userDataApi?.Dispose();
+            userTradeApi?.Dispose();
+
+            Throttler?.Dispose();
+        }
     }
 }

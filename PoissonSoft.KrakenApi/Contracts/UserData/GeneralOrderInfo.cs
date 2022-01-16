@@ -27,7 +27,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserData
         /// Unix timestamp of when order was placed
         /// </summary>
         [JsonProperty("opentm")]
-        public string OpenTime { get; set; }
+        public decimal OpenTime { get; set; }
 
         /// <summary>
         /// Unix timestamp of order start time (or 0 if not set)
@@ -111,7 +111,7 @@ namespace PoissonSoft.KrakenApi.Contracts.UserData
         /// Unix timestamp of when order was closed
         /// </summary>
         [JsonProperty("closetm")]
-        public string CloseTime { get; set; }
+        public decimal CloseTime { get; set; }
 
         /// <summary>
         /// Additional info on status (if any)
